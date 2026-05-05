@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: gppremium-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gppremium
+      MYSQL_USER: monty
+      MYSQL_PASSWORD: some_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/gppremium?useSSL=false&allowPublicKeyRetrieval=true&useTimezone=true&serverTimezone=America/Sao_Paulo
+      SPRING_DATASOURCE_USERNAME: monty
+      SPRING_DATASOURCE_PASSWORD: some_pass
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: >
+      /bin/sh -c "
+      echo 'Aguardando o MySQL ficar pronto...' &&
+      while ! nc -z mysql 3306; do sleep 1; done &&
+      echo 'Iniciando a aplicação...'
+      "
+
+volumes:
+  mysql_data:

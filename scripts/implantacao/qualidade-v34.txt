@@ -1,0 +1,48 @@
+-- MySQL Workbench Synchronization
+-- Generated: 2022-08-06 18:50
+-- Model: Sakila Full
+-- Version: 2.0
+-- Project: Name of the project
+-- Author: Mike
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+ALTER TABLE `gppremium`.`controle_qualidade` 
+DROP COLUMN `tipo_classificacao_id`,
+ADD COLUMN `dt_create` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `tipo_observacao_id`,
+ADD COLUMN `dt_update` DATETIME NULL DEFAULT NULL AFTER `dt_create`,
+ADD COLUMN `dt_delete` DATETIME NULL DEFAULT NULL AFTER `dt_update`,
+CHANGE COLUMN `tipo_observacao_id` `tipo_observacao_id` INT(11) NOT NULL ,
+ADD INDEX `fk_controle_qualidade_tipo_observacao1_idx1` (`tipo_observacao_id` ASC) VISIBLE,
+ADD UNIQUE INDEX `producao_id_UNIQUE` (`producao_id` ASC) VISIBLE,
+DROP INDEX `fk_controle_qualidade_tipo_observacao1_idx` ,
+DROP INDEX `fk_controle_qualidade_tipo_classificacao1_idx` ;
+;
+
+ALTER TABLE `gppremium`.`tipo_observacao` 
+ADD COLUMN `tipo_classificacao_id` INT(11) NOT NULL AFTER `descricao`,
+ADD INDEX `fk_tipo_observacao_tipo_classificacao1_idx` (`tipo_classificacao_id` ASC) VISIBLE;
+;
+
+DROP TABLE IF EXISTS `gppremium`.`credenciados` ;
+
+ALTER TABLE `gppremium`.`controle_qualidade` 
+ADD CONSTRAINT `fk_controle_qualidade_tipo_observacao1`
+  FOREIGN KEY (`tipo_observacao_id`)
+  REFERENCES `gppremium`.`tipo_observacao` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `gppremium`.`tipo_observacao` 
+ADD CONSTRAINT `fk_tipo_observacao_tipo_classificacao1`
+  FOREIGN KEY (`tipo_classificacao_id`)
+  REFERENCES `gppremium`.`tipo_classificacao` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

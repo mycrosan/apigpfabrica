@@ -1,0 +1,11 @@
+SET FOREIGN_KEY_CHECKS = 0;
+truncate antiquebra;
+truncate camelback;
+truncate carcaca;
+truncate espessuramento;
+truncate marca;
+truncate matriz;
+truncate medida;
+truncate modelo;
+truncate pais;
+truncate regra;
