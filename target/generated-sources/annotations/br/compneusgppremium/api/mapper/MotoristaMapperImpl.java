@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-05-05T18:46:00-0300",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
+    date = "2026-05-06T06:21:27-0300",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.11 (Eclipse Adoptium)"
 )
 @Component
 public class MotoristaMapperImpl implements MotoristaMapper {
@@ -79,14 +79,14 @@ public class MotoristaMapperImpl implements MotoristaMapper {
         if ( dto.getNome() != null ) {
             target.setNome( dto.getNome() );
         }
-        if ( dto.getObservacoes() != null ) {
-            target.setObservacoes( dto.getObservacoes() );
+        if ( dto.getTelefone() != null ) {
+            target.setTelefone( dto.getTelefone() );
         }
         if ( dto.getPlacaVeiculo() != null ) {
             target.setPlacaVeiculo( dto.getPlacaVeiculo() );
         }
-        if ( dto.getTelefone() != null ) {
-            target.setTelefone( dto.getTelefone() );
+        if ( dto.getObservacoes() != null ) {
+            target.setObservacoes( dto.getObservacoes() );
         }
     }
 
