@@ -1,0 +1,11 @@
+br/compneusgppremium/api/controller/AutenticacaoControllerTest.class
+br/compneusgppremium/api/GpPremiumApplicationTests.class
+br/compneusgppremium/api/controller/ConfiguracaoMaquinaControllerTest.class
+br/compneusgppremium/api/controller/UsuarioControllerTest.class
+br/compneusgppremium/api/controller/RegistroMaquinaControllerTest.class
+br/compneusgppremium/api/controller/ProducaoControllerTest.class
+br/compneusgppremium/api/repository/UsuarioRepositoryTest.class
+br/compneusgppremium/api/controller/MotoristaControllerTest.class
+br/compneusgppremium/api/service/TokenServiceTest.class
+br/compneusgppremium/api/integration/FluxoValidacaoRegraIT.class
+br/compneusgppremium/api/repository/ProducaoRepositoryTest.class
