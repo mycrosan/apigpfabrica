@@ -10,21 +10,13 @@
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/AuditoriaRepository.java">
 <error line="7" column="13" severity="warning" message="O nome &apos;existsByTabelaAfetadaAndUsuario_Id&apos; deve condizer com o padrão &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.MethodNameCheck"/>
 </file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/MarcaRepository.java">
-</file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/RegistroMaquinaRepository.java">
 <error line="42" severity="warning" message="A linha contém mais do que 120 caracteres (foram encontrados 131)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
 <error line="43" severity="warning" message="A linha contém mais do que 120 caracteres (foram encontrados 121)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
 <error line="46" severity="warning" message="A linha contém mais do que 120 caracteres (foram encontrados 183)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
 </file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/AntiquebraRepository.java">
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/CamelbackRepository.java">
-</file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/ProducaoRepository.java">
 <error line="3" severity="warning" message="A forma de importação &apos;.*&apos; deveria ser evitada - br.compneusgppremium.api.controller.model.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/EspessuramentoRepository.java">
 </file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/ColaRepository.java">
 <error line="18" column="41" severity="warning" message="&apos;+&apos; deveria estar numa nova linha." source="com.puppycrawl.tools.checkstyle.checks.whitespace.OperatorWrapCheck"/>
@@ -114,12 +106,6 @@
 <error line="33" column="51" severity="warning" message="&apos;+&apos; deveria estar numa nova linha." source="com.puppycrawl.tools.checkstyle.checks.whitespace.OperatorWrapCheck"/>
 <error line="34" column="44" severity="warning" message="&apos;+&apos; deveria estar numa nova linha." source="com.puppycrawl.tools.checkstyle.checks.whitespace.OperatorWrapCheck"/>
 </file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/TipoClassificacaoRepository.java">
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/MotoristaRepository.java">
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/UsuarioRepository.java">
-</file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/ResumoRepository.java">
 <error line="13" column="29" severity="warning" message="O parâmetro jdbcTemplate deve ser final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
 <error line="17" column="5" severity="warning" message="A classe &apos;ResumoRepository&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;getResumo&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;ResumoRepository&apos; ser final, tornar o método &apos;getResumo&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
@@ -148,14 +134,8 @@
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/StatusCarcacaRepository.java">
 <error line="3" column="8" severity="warning" message="Importação não utilizada - br.compneusgppremium.api.controller.model.PaisModel." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
 </file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/TipoObservacaoRepository.java">
-</file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/CarcacaRejeitadaRepository.java">
 <error line="15" column="5" severity="warning" message="O modificador &apos;public&apos; é redundante." source="com.puppycrawl.tools.checkstyle.checks.modifier.RedundantModifierCheck"/>
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/MedidaRepository.java">
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/SonoffRepository.java">
 </file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/PneuVulcanizadoRepository.java">
 <error line="21" severity="warning" message="A linha contém mais do que 120 caracteres (foram encontrados 129)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
@@ -174,8 +154,6 @@
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/MatrizRepository.java">
 <error line="8" column="80" severity="warning" message="&apos;{&apos; não está seguido de espaço em branco." source="com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck"/>
 <error line="8" column="81" severity="warning" message="&apos;}&apos; não está precedido por espaço em branco." source="com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck"/>
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/PaisRepository.java">
 </file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/repository/TipoValidaRegraRepository.java">
 <error line="3" column="8" severity="warning" message="Importação não utilizada - br.compneusgppremium.api.controller.model.PaisModel." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
@@ -319,8 +297,6 @@
 <error line="29" column="3" severity="warning" message="A classe &apos;ResponseMessage&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;setContent&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;ResponseMessage&apos; ser final, tornar o método &apos;setContent&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
 <error line="29" column="26" severity="warning" message="O parâmetro content deve ser final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
 </file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/SonoffCreateDTO.java">
-</file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/ConfiguracaoMaquinaCreateDTO.java">
 <error line="24" column="17" severity="warning" message="&apos;100&apos; é um número mágico." source="com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"/>
 <error line="31" severity="warning" message="A linha contém mais do que 120 caracteres (foram encontrados 126)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
@@ -346,10 +322,6 @@
 <error line="79" column="5" severity="warning" message="A classe &apos;ConfiguracaoMaquinaCreateDTO&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;getAtributos&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;ConfiguracaoMaquinaCreateDTO&apos; ser final, tornar o método &apos;getAtributos&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
 <error line="83" column="5" severity="warning" message="A classe &apos;ConfiguracaoMaquinaCreateDTO&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;setAtributos&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;ConfiguracaoMaquinaCreateDTO&apos; ser final, tornar o método &apos;setAtributos&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
 <error line="83" column="30" severity="warning" message="O parâmetro atributos deve ser final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/ReleCreateDTO.java">
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/ReleResponseDTO.java">
 </file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/ProducaoPesquisaDTO.java">
 <error line="3" column="8" severity="warning" message="Importação não utilizada - br.compneusgppremium.api.controller.model.CarcacaModel." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
@@ -425,8 +397,6 @@
 <error line="151" column="5" severity="warning" message="A classe &apos;ConfiguracaoMaquinaResponseDTO&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;setUsuarioId&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;ConfiguracaoMaquinaResponseDTO&apos; ser final, tornar o método &apos;setUsuarioId&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
 <error line="151" column="30" severity="warning" message="O parâmetro usuarioId deve ser final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
 </file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/SonoffResponseDTO.java">
-</file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/TokenDto.java">
 <error line="17" column="21" severity="warning" message="O parâmetro token deve ser final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
 <error line="17" column="35" severity="warning" message="O parâmetro tipo deve ser final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
@@ -434,8 +404,6 @@
 <error line="23" column="5" severity="warning" message="A classe &apos;TokenDto&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;getToken&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;TokenDto&apos; ser final, tornar o método &apos;getToken&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
 <error line="27" column="5" severity="warning" message="A classe &apos;TokenDto&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;getTipo&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;TokenDto&apos; ser final, tornar o método &apos;getTipo&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
 <error line="31" column="5" severity="warning" message="A classe &apos;TokenDto&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;getStatus&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;TokenDto&apos; ser final, tornar o método &apos;getStatus&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/MatrizResumoDTO.java">
 </file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/MotoristaCreateDTO.java">
 <error line="24" column="17" severity="warning" message="&apos;1024&apos; é um número mágico." source="com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"/>
@@ -453,8 +421,6 @@
 <error line="22" column="5" severity="warning" message="A classe &apos;UsuarioResponsavelDTO&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;setNome&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;UsuarioResponsavelDTO&apos; ser final, tornar o método &apos;setNome&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
 <error line="22" column="25" severity="warning" message="O parâmetro nome deve ser final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
 <error line="22" column="38" severity="warning" message="O &apos;{&apos; na coluna 38 deveria ser seguido de uma quebra de linha." source="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck"/>
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/ProducaoFilterDTO.java">
 </file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/MotoristaResponseDTO.java">
 <error line="7" column="13" severity="warning" message="A variável &apos;id&apos; deveria ser privada e ter métodos acessores." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
@@ -795,8 +761,6 @@
 <error line="100" column="45" severity="warning" message="O parâmetro filename deve ser final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
 <error line="103" severity="warning" message="A linha contém mais do que 120 caracteres (foram encontrados 123)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
 </file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/enums/RegraStatus.java">
-</file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/AntiquebraController.java">
 <error line="4" column="8" severity="warning" message="Importação não utilizada - br.compneusgppremium.api.controller.model.PaisModel." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
 <error line="8" severity="warning" message="A forma de importação &apos;.*&apos; deveria ser evitada - org.springframework.web.bind.annotation.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
@@ -1076,8 +1040,6 @@
 <error line="18" column="55" severity="warning" message="&apos;11&apos; é um número mágico." source="com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"/>
 <error line="27" column="22" severity="warning" message="&apos;1024&apos; é um número mágico." source="com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"/>
 </file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/MatrizModel.java">
-</file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/PaisModel.java">
 <error line="6" severity="warning" message="A forma de importação &apos;.*&apos; deveria ser evitada - javax.persistence.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
 </file>
@@ -1097,10 +1059,6 @@
 <error line="100" severity="warning" message="A estrutura &apos;if&apos; deve utilizar &apos;{}&apos;s." source="com.puppycrawl.tools.checkstyle.checks.blocks.NeedBracesCheck"/>
 <error line="101" severity="warning" message="A estrutura &apos;if&apos; deve utilizar &apos;{}&apos;s." source="com.puppycrawl.tools.checkstyle.checks.blocks.NeedBracesCheck"/>
 <error line="106" column="5" severity="warning" message="A classe &apos;UsuarioModel&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;hashCode&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;UsuarioModel&apos; ser final, tornar o método &apos;hashCode&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/ResumoCarcacasModel.java">
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/EspessuramentoModel.java">
 </file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/ModeloModel.java">
 <error line="5" severity="warning" message="A forma de importação &apos;.*&apos; deveria ser evitada - javax.persistence.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
@@ -1129,8 +1087,6 @@
 <error line="14" column="20" severity="warning" message="A variável &apos;id&apos; deveria ser privada e ter métodos acessores." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
 <error line="18" column="19" severity="warning" message="A variável &apos;descricao&apos; deveria ser privada e ter métodos acessores." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
 </file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/StatusCarcacaModel.java">
-</file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/TipoConfiguracao.java">
 <error line="28" column="22" severity="warning" message="O parâmetro descricao deve ser final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
 </file>
@@ -1141,8 +1097,6 @@
 <error line="26" column="22" severity="warning" message="A variável &apos;pais&apos; deveria ser privada e ter métodos acessores." source="com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck"/>
 <error line="35" column="18" severity="warning" message="O nome &apos;dt_create&apos; deve condizer com o padrão &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck"/>
 <error line="38" column="18" severity="warning" message="O nome &apos;dt_update&apos; deve condizer com o padrão &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck"/>
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/CamelbackModel.java">
 </file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/QualidadeModel.java">
 <error line="8" severity="warning" message="A forma de importação &apos;.*&apos; deveria ser evitada - javax.persistence.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
@@ -1164,8 +1118,6 @@
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/ValidaRegraModel.java">
 <error line="6" severity="warning" message="A forma de importação &apos;.*&apos; deveria ser evitada - javax.persistence.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
 <error line="29" column="34" severity="warning" message="O nome &apos;tipo_valida_regra&apos; deve condizer com o padrão &apos;^[a-z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck"/>
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/StatusMaquina.java">
 </file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/ProducaoModel.java">
 <error line="4" column="8" severity="warning" message="Importação não utilizada - com.fasterxml.jackson.annotation.JsonIgnore." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
@@ -1209,10 +1161,6 @@
 <error line="74" column="5" severity="warning" message="A classe &apos;RegistroMaquinaModel&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;colocarEmManutencao&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;RegistroMaquinaModel&apos; ser final, tornar o método &apos;colocarEmManutencao&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
 <error line="80" column="5" severity="warning" message="A classe &apos;RegistroMaquinaModel&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;ativar&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;RegistroMaquinaModel&apos; ser final, tornar o método &apos;ativar&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
 <error line="86" column="5" severity="warning" message="A classe &apos;RegistroMaquinaModel&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;inativar&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;RegistroMaquinaModel&apos; ser final, tornar o método &apos;inativar&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/TipoValidaRegraModel.java">
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/AntiquebraModel.java">
 </file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/RegraModel.java">
 <error line="7" severity="warning" message="A forma de importação &apos;.*&apos; deveria ser evitada - javax.persistence.*." source="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck"/>
@@ -1756,14 +1704,8 @@
 <error line="14" column="3" severity="warning" message="A classe &apos;FileUploadExceptionAdvice&apos; parece ter sido projetada para extensão (permite subclasses), mas o método &apos;handleMaxSizeException&apos; não tem um javadoc que explica como fazer isso de forma segura. Se a classe não é projetada para extensão, considere fazer a classe &apos;FileUploadExceptionAdvice&apos; ser final, tornar o método &apos;handleMaxSizeException&apos; estático/final/abstrato/vazio ou adicione as anotações permitidas ao método." source="com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck"/>
 <error line="15" column="65" severity="warning" message="O parâmetro exc deve ser final." source="com.puppycrawl.tools.checkstyle.checks.FinalParametersCheck"/>
 </file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/resources/application-dev.properties">
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/resources/application-test.properties">
-</file>
 <file name="/Users/my/Documents/www/GP/apigpfabrica/src/main/resources/application.properties">
 <error line="14" severity="warning" message="A linha contém mais do que 120 caracteres (foram encontrados 277)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
 <error line="36" severity="warning" message="A linha contém mais do que 120 caracteres (foram encontrados 121)." source="com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck"/>
-</file>
-<file name="/Users/my/Documents/www/GP/apigpfabrica/src/test/resources/application-test.properties">
 </file>
 </checkstyle>
