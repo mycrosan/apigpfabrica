@@ -34,6 +34,11 @@ public class QualidadeModel {
     @ManyToOne
     @Schema(description = "Tipo de observação do controle de qualidade")
     private TipoObservacaoModel tipo_observacao;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    @Schema(description = "Usuário responsável pela classificação da qualidade")
+    private UsuarioModel usuario;
     
     @Column
     @Schema(description = "Data de criação do controle de qualidade")

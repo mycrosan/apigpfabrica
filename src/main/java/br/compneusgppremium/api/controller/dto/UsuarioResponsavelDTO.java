@@ -10,9 +10,18 @@ public class UsuarioResponsavelDTO {
     @Schema(description = "Nome do usuário", example = "Maria Santos")
     private String nome;
 
+    @Schema(description = "Login do usuário", example = "maria.santos")
+    private String login;
+
     public UsuarioResponsavelDTO(Long id, String nome) {
         this.id = id;
         this.nome = nome;
+    }
+
+    public UsuarioResponsavelDTO(Long id, String nome, String login) {
+        this.id = id;
+        this.nome = nome;
+        this.login = login;
     }
 
     public Long getId() { return id; }
@@ -20,4 +29,7 @@ public class UsuarioResponsavelDTO {
 
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
+
+    public String getLogin() { return login; }
+    public void setLogin(String login) { this.login = login; }
 }

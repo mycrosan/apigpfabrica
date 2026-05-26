@@ -64,6 +64,7 @@
 /Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/ReleCreateDTO.java
 /Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/PneuVulcanizadoResponseDTO.java
 /Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/service/TokenService.java
+/Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/dto/QualidadeDTO.java
 /Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/PerfilModel.java
 /Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/model/ModeloModel.java
 /Users/my/Documents/www/GP/apigpfabrica/src/main/java/br/compneusgppremium/api/controller/EspessuramentoController.java

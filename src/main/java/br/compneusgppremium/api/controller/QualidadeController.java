@@ -1,13 +1,16 @@
 package br.compneusgppremium.api.controller;
 
+import br.compneusgppremium.api.controller.dto.QualidadeDTO;
 import br.compneusgppremium.api.controller.model.*;
 import br.compneusgppremium.api.controller.enums.RegraStatus;
 import br.compneusgppremium.api.repository.CarcacaRepository;
 import br.compneusgppremium.api.repository.ProducaoRepository;
 import br.compneusgppremium.api.repository.QualidadeRepository;
 import br.compneusgppremium.api.repository.RegraRepository;
+import br.compneusgppremium.api.repository.UsuarioRepository;
 import br.compneusgppremium.api.repository.ValidaRegraRepository;
 import br.compneusgppremium.api.util.ApiError;
+import br.compneusgppremium.api.util.UsuarioLogadoUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +27,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 
@@ -47,6 +52,12 @@ public class QualidadeController {
     @Autowired
     private ValidaRegraRepository validaRegraRepository;
 
+    @Autowired
+    private UsuarioLogadoUtil usuarioLogadoUtil;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -67,7 +78,8 @@ public class QualidadeController {
         var sql = "SELECT cq FROM controle_qualidade cq ORDER BY cq.dt_create DESC";
         try {
             Query consulta = entityManager.createQuery(sql);
-            return consulta.setMaxResults(100).getResultList();
+            List<QualidadeModel> resultados = consulta.setMaxResults(100).getResultList();
+            return resultados.stream().map(QualidadeDTO::fromModel).collect(Collectors.toList());
         } catch (Exception e) {
             return e;
         }
@@ -81,7 +93,7 @@ public class QualidadeController {
     @GetMapping(path = "/api/qualidade/{id}")
     public ResponseEntity consultar(@Parameter(description = "ID do controle de qualidade") @PathVariable("id") Integer id) {
         return qualidadeRepository.findById(id)
-                .map(record -> ResponseEntity.ok().body(record))
+                .map(record -> ResponseEntity.ok().body(QualidadeDTO.fromModel(record)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -134,6 +146,12 @@ public class QualidadeController {
                         record.setStatus_carcaca(statusCarcaca);
                         carcacaRepository.save(record);
                         qualidade.setDt_create(new Date());
+
+                        Long usuarioId = usuarioLogadoUtil.getUsuarioIdLogado();
+                        UsuarioModel usuario = usuarioRepository.findById(usuarioId)
+                                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                        qualidade.setUsuario(usuario);
+
                         QualidadeModel qualidadeSalva = qualidadeRepository.save(qualidade);
 
                         // Se aprovado na qualidade (tipo_classificacao id == 1), validar a regra
@@ -205,7 +223,7 @@ public class QualidadeController {
             if (retornoConsulta.size() > 1) {
                 throw new RuntimeException("O sistema encontrou mais de uma carcaca com a mesma etiqueta");
             } else if (retornoConsulta.size() == 1) {
-                return retornoConsulta.get(0);
+                return QualidadeDTO.fromModel(retornoConsulta.get(0));
             }
             throw new RuntimeException("Carcaça etiqueta " + etiqueta + " não qualificada");
         } catch (Exception ex) {

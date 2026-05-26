@@ -16,7 +16,7 @@ public interface QualidadeRepository extends CrudRepository<QualidadeModel, Inte
     public Optional<QualidadeModel> findByProducaoId(@Param("producaoId") Integer producaoId);
 
     @Query("SELECT cq FROM controle_qualidade cq JOIN cq.producao e JOIN e.carcaca c WHERE c.numero_etiqueta = :numeroEtiqueta")
-    public List<Object> findByEtiqueta(@Param("numeroEtiqueta") String numeroEtiqueta);
+    public List<QualidadeModel> findByEtiqueta(@Param("numeroEtiqueta") String numeroEtiqueta);
 
 
 }
