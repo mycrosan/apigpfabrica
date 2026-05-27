@@ -2,9 +2,12 @@ package br.compneusgppremium.api.controller;
 
 import br.compneusgppremium.api.controller.model.CarcacaModel;
 import br.compneusgppremium.api.controller.model.StatusCarcacaModel;
+import br.compneusgppremium.api.controller.model.UsuarioModel;
 import br.compneusgppremium.api.repository.CarcacaRepository;
+import br.compneusgppremium.api.repository.UsuarioRepository;
 import br.compneusgppremium.api.util.ApiError;
 import br.compneusgppremium.api.util.OperationSystem;
+import br.compneusgppremium.api.util.UsuarioLogadoUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,6 +41,12 @@ public class CarcacaController {
 
     @Autowired
     private CarcacaRepository repository;
+
+    @Autowired
+    private UsuarioLogadoUtil usuarioLogadoUtil;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -145,7 +154,14 @@ public class CarcacaController {
             carcaca.setStatus_carcaca(statusCarcaca);
 //            carcaca.setDados(carcaca.toString());
             carcaca.setDt_create(new Date());
+            carcaca.setDt_update(new Date());
             carcaca.setUuid(UUID.randomUUID());
+
+            Long usuarioId = usuarioLogadoUtil.getUsuarioIdLogado();
+            UsuarioModel usuario = usuarioRepository.findById(usuarioId)
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+            carcaca.setCriadoPor(usuario);
+
             return repository.save(carcaca);
         } catch (Exception e) {
             return e;

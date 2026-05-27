@@ -1,6 +1,7 @@
 package br.compneusgppremium.api.controller.model;
 
 import br.compneusgppremium.api.util.JpaConverterJson;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -57,6 +58,12 @@ public class CarcacaModel {
     @ManyToOne
     @Schema(description = "Status específico da carcaça")
     public StatusCarcacaModel status_carcaca;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    @JsonIgnoreProperties({"perfil"})
+    @Schema(description = "Usuário que cadastrou a carcaça (pode ser null para registros antigos)")
+    private UsuarioModel criadoPor;
 
     @Column
     @Schema(description = "Data de criação da carcaça")
