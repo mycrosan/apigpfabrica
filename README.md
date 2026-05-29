@@ -186,6 +186,8 @@ Regra =
 
 mvn clean package -P wildfly -DskipTests
 
+$2a$10$MamUEkkHyKUiSwL7PNhw..NmFYqHt.ZMsHfQR1AehHsZ/irX4pfKKß
+
 
 
 
