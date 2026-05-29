@@ -147,7 +147,7 @@ public class QualidadeController {
                         carcacaRepository.save(record);
                         qualidade.setDt_create(new Date());
 
-                        Long usuarioId = usuarioLogadoUtil.getUsuarioIdLogado();
+                        Integer usuarioId = usuarioLogadoUtil.getUsuarioIdLogado();
                         UsuarioModel usuario = usuarioRepository.findById(usuarioId)
                                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
                         qualidade.setUsuario(usuario);

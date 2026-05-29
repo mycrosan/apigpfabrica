@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UsuarioLogadoUtil {
 
-    public Long getUsuarioIdLogado() {
+    public Integer getUsuarioIdLogado() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null && auth.isAuthenticated()) {
@@ -25,7 +25,7 @@ public class UsuarioLogadoUtil {
 
             if (principal instanceof String) {
                 try {
-                    return Long.parseLong((String) principal);
+                    return Integer.parseInt((String) principal);
                 } catch (NumberFormatException e) {
                     throw new RuntimeException("Principal não é um ID válido");
                 }

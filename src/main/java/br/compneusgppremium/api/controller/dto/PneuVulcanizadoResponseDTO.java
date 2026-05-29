@@ -15,7 +15,7 @@ public class PneuVulcanizadoResponseDTO {
     private Long id;
 
     @Schema(description = "ID do usuário responsável", example = "1")
-    private Long usuarioId;
+    private Integer usuarioId;
 
     @Schema(description = "Nome do usuário responsável", example = "João Silva")
     private String usuarioNome;
@@ -38,7 +38,7 @@ public class PneuVulcanizadoResponseDTO {
     // Construtores
     public PneuVulcanizadoResponseDTO() {}
 
-    public PneuVulcanizadoResponseDTO(Long id, Long usuarioId, String usuarioNome, 
+    public PneuVulcanizadoResponseDTO(Long id, Integer usuarioId, String usuarioNome, 
                                      Integer producaoId, String numeroEtiqueta, StatusVulcanizacao status, 
                                      LocalDateTime dtCreate, LocalDateTime dtUpdate) {
         this.id = id;
@@ -60,11 +60,11 @@ public class PneuVulcanizadoResponseDTO {
         this.id = id;
     }
 
-    public Long getUsuarioId() {
+    public Integer getUsuarioId() {
         return usuarioId;
     }
 
-    public void setUsuarioId(Long usuarioId) {
+    public void setUsuarioId(Integer usuarioId) {
         this.usuarioId = usuarioId;
     }
 

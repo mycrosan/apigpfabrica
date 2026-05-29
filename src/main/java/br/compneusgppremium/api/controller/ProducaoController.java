@@ -232,7 +232,7 @@ public class ProducaoController {
                         producao.setDt_update(new Date());
                         producao.setUuid(UUID.randomUUID());
 
-                        Long userId = usuarioLogadoUtil.getUsuarioIdLogado();
+                        Integer userId = usuarioLogadoUtil.getUsuarioIdLogado();
                         UsuarioModel usuario = usuarioRepository.findById(userId)
                                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
                         producao.setCriadoPor(usuario);

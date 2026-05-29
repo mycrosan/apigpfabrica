@@ -32,7 +32,7 @@ class TokenServiceTest {
 
         // Criar usuário de teste
         usuario = new UsuarioModel();
-        usuario.setId(1L);
+        usuario.setId(1);
         usuario.setNome("Teste Usuario");
         usuario.setLogin("teste@teste.com");
     }
@@ -101,7 +101,7 @@ class TokenServiceTest {
         String token = tokenService.gerarToken(authentication);
 
         // Act
-        Long userId = tokenService.getIdUsuario(token);
+        Integer userId = tokenService.getIdUsuario(token);
 
         // Assert
         assertEquals(usuario.getId(), userId);

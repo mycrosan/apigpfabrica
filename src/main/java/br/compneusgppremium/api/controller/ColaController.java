@@ -70,7 +70,7 @@ public class ColaController {
 
             cola.setProducao(producao);
 
-            Long userId = usuarioLogadoUtil.getUsuarioIdLogado();
+            Integer userId = usuarioLogadoUtil.getUsuarioIdLogado();
             UsuarioModel usuario = usuarioRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
             cola.setUsuario(usuario);
@@ -155,7 +155,7 @@ public class ColaController {
             }
 
             // Atualiza responsável
-            Long userId = usuarioLogadoUtil.getUsuarioIdLogado();
+            Integer userId = usuarioLogadoUtil.getUsuarioIdLogado();
             UsuarioModel usuario = usuarioRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
             colaExistente.setUsuario(usuario);

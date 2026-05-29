@@ -40,7 +40,7 @@ public class PneuVulcanizadoService {
     /**
      * Cria um novo pneu vulcanizado com status INICIADO
      */
-    public PneuVulcanizadoResponseDTO criar(PneuVulcanizadoCreateDTO createDTO, Long usuarioId) {
+    public PneuVulcanizadoResponseDTO criar(PneuVulcanizadoCreateDTO createDTO, Integer usuarioId) {
         // Validar se usuário existe
         UsuarioModel usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado com ID: " + usuarioId));
@@ -51,7 +51,7 @@ public class PneuVulcanizadoService {
 
         // Validar apenas se a produção já foi concluída com sucesso (status FINALIZADO)
         Long finalizados = pneuVulcanizadoRepository
-                .countByProducaoIdAndStatus(Long.valueOf(createDTO.getProducaoId()), StatusVulcanizacao.FINALIZADO);
+                .countByProducaoIdAndStatus(createDTO.getProducaoId(), StatusVulcanizacao.FINALIZADO);
         if (finalizados != null && finalizados > 0) {
             throw new RuntimeException("Produção já realizada. Não pode ser vulcanizada novamente.");
         }
@@ -60,8 +60,7 @@ public class PneuVulcanizadoService {
         PneuVulcanizadoModel pneuVulcanizado = new PneuVulcanizadoModel();
         pneuVulcanizado.setUsuarioId(usuarioId);
         pneuVulcanizado.setUsuario(usuario);
-        // ProducaoModel usa Integer como ID, enquanto PneuVulcanizadoModel armazena Long
-        pneuVulcanizado.setProducaoId(Long.valueOf(createDTO.getProducaoId()));
+        pneuVulcanizado.setProducaoId(createDTO.getProducaoId());
         pneuVulcanizado.setProducao(producao);
         pneuVulcanizado.setStatus(StatusVulcanizacao.INICIADO); // Status padrão
         pneuVulcanizado.setDtCreate(java.time.LocalDateTime.now());
@@ -113,7 +112,7 @@ public class PneuVulcanizadoService {
      * Lista pneus vulcanizados por usuário
      */
     @Transactional(readOnly = true)
-    public List<PneuVulcanizadoResponseDTO> listarPorUsuario(Long usuarioId) {
+    public List<PneuVulcanizadoResponseDTO> listarPorUsuario(Integer usuarioId) {
         List<PneuVulcanizadoModel> pneus = pneuVulcanizadoRepository.findByUsuarioId(usuarioId);
         return pneus.stream()
                 .map(this::converterParaResponseDTO)
@@ -144,7 +143,7 @@ public class PneuVulcanizadoService {
      * Lista todos os pneus vulcanizados com paginação e filtros
      */
     @Transactional(readOnly = true)
-    public Page<PneuVulcanizadoResponseDTO> listarTodos(int page, int size, Long usuarioId, String status) {
+    public Page<PneuVulcanizadoResponseDTO> listarTodos(int page, int size, Integer usuarioId, String status) {
         Pageable pageable = PageRequest.of(page, size);
         Page<PneuVulcanizadoModel> pneus;
         
@@ -198,7 +197,7 @@ public class PneuVulcanizadoService {
      * Conta pneus vulcanizados por usuário
      */
     @Transactional(readOnly = true)
-    public long contarPorUsuario(Long usuarioId) {
+    public long contarPorUsuario(Integer usuarioId) {
         return pneuVulcanizadoRepository.countByUsuarioId(usuarioId);
     }
 

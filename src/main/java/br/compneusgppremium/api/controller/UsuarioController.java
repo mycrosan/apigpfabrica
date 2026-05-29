@@ -91,7 +91,7 @@ public class UsuarioController {
     })
     public ResponseEntity<UsuarioModel> obterUsuarioLogado() {
         try {
-            Long usuarioId = usuarioLogadoUtil.getUsuarioIdLogado();
+            Integer usuarioId = usuarioLogadoUtil.getUsuarioIdLogado();
             Optional<UsuarioModel> usuarioOpt = repository.findById(usuarioId);
             return usuarioOpt
                     .map(ResponseEntity::ok)
@@ -126,7 +126,7 @@ public class UsuarioController {
     })
     public ResponseEntity<UsuarioModel> consultar(
         @Parameter(description = "ID do usuário", required = true, example = "1")
-        @PathVariable("id") Long id
+        @PathVariable("id") Integer id
     ) {
         Optional<UsuarioModel> usuarioOpt = repository.findById(id);
         return usuarioOpt
@@ -213,7 +213,7 @@ public class UsuarioController {
     })
     public ResponseEntity<?> atualizarUsuario(
         @Parameter(description = "ID do usuário", required = true, example = "1")
-        @PathVariable("id") Long id,
+        @PathVariable("id") Integer id,
         @Parameter(description = "Dados atualizados do usuário", required = true)
         @RequestBody UsuarioModel usuarioRequest
     ) {
@@ -260,7 +260,7 @@ public class UsuarioController {
     })
     public ResponseEntity<?> delete(
         @Parameter(description = "ID do usuário", required = true, example = "1")
-        @PathVariable("id") Long id
+        @PathVariable("id") Integer id
     ) {
         return repository.findById(id)
                 .map(usuario -> {

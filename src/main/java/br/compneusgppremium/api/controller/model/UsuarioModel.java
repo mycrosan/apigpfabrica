@@ -21,7 +21,7 @@ public class UsuarioModel implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "ID único do usuário", example = "1")
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false)
     @Schema(description = "Nome completo do usuário", example = "João Silva")

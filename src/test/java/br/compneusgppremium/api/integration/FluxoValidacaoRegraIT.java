@@ -42,7 +42,7 @@ public class FluxoValidacaoRegraIT {
     @Autowired private UsuarioRepository usuarioRepository;
 
     private void autenticarUsuarioTeste() {
-        UsuarioModel usuario = usuarioRepository.findById(1L)
+        UsuarioModel usuario = usuarioRepository.findById(1)
                 .orElseThrow(() -> new RuntimeException("Usuário de teste não encontrado"));
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                 usuario, null, usuario.getAuthorities());

@@ -91,7 +91,7 @@ public class ConfiguracaoMaquinaController {
             }
 
             // Obter o usuário logado
-            Long usuarioId = usuarioLogadoUtil.getUsuarioIdLogado();
+            Integer usuarioId = usuarioLogadoUtil.getUsuarioIdLogado();
 
             // Criar nova configuração
             ConfiguracaoMaquinaModel configuracao = new ConfiguracaoMaquinaModel();

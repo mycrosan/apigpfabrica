@@ -180,7 +180,12 @@ lsof -ti:8080
 
 mvn clean package -DskipTests
 
-Regra = 5103
+
+
+Regra = 
+
+mvn clean package -P wildfly -DskipTests
+
 
 
 

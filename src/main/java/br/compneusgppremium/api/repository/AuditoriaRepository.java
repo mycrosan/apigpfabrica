@@ -4,5 +4,5 @@ import br.compneusgppremium.api.controller.model.AuditoriaModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AuditoriaRepository extends JpaRepository<AuditoriaModel, Long> {
-    boolean existsByTabelaAfetadaAndUsuario_Id(String tabelaAfetada, Long usuarioId);
+    boolean existsByTabelaAfetadaAndUsuario_Id(String tabelaAfetada, Integer usuarioId);
 }

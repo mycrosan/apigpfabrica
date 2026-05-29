@@ -23,11 +23,11 @@ public class PneuVulcanizadoModel {
 
     @Column(name = "usuario_id", nullable = false)
     @Schema(description = "ID do usuário responsável pela vulcanização", example = "1")
-    private Long usuarioId;
+    private Integer usuarioId;
 
     @Column(name = "producao_id", nullable = false)
     @Schema(description = "ID da produção relacionada", example = "1")
-    private Long producaoId;
+    private Integer producaoId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)

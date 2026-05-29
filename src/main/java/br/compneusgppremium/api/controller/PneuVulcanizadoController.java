@@ -53,7 +53,7 @@ public class PneuVulcanizadoController {
     })
     public ResponseEntity<?> criarPneuVulcanizado(@Valid @RequestBody PneuVulcanizadoCreateDTO dto) {
         try {
-            Long usuarioId = usuarioLogadoUtil.getUsuarioIdLogado();
+            Integer usuarioId = usuarioLogadoUtil.getUsuarioIdLogado();
             PneuVulcanizadoResponseDTO response = pneuVulcanizadoService.criar(dto, usuarioId);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (IllegalArgumentException e) {
@@ -79,7 +79,7 @@ public class PneuVulcanizadoController {
             @Parameter(description = "Tamanho da página", example = "10")
             @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "ID do usuário para filtrar")
-            @RequestParam(required = false) Long usuarioId,
+            @RequestParam(required = false) Integer usuarioId,
             @Parameter(description = "Status para filtrar (INICIADO, FINALIZADO)")
             @RequestParam(required = false) String status) {
         
@@ -170,7 +170,7 @@ public class PneuVulcanizadoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de pneus vulcanizados retornada com sucesso")
     })
-    public ResponseEntity<List<PneuVulcanizadoResponseDTO>> listarPorUsuario(@PathVariable Long usuarioId) {
+    public ResponseEntity<List<PneuVulcanizadoResponseDTO>> listarPorUsuario(@PathVariable Integer usuarioId) {
         List<PneuVulcanizadoResponseDTO> pneus = pneuVulcanizadoService.listarPorUsuario(usuarioId);
         return ResponseEntity.ok(pneus);
     }
@@ -224,7 +224,7 @@ public class PneuVulcanizadoController {
     })
     public ResponseEntity<Map<String, Object>> obterEstatisticas(
             @Parameter(description = "ID do usuário para filtrar estatísticas")
-            @RequestParam(required = false) Long usuarioId) {
+            @RequestParam(required = false) Integer usuarioId) {
         
         Map<String, Object> estatisticas = new HashMap<>();
         

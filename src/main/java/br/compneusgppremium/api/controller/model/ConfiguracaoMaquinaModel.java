@@ -60,7 +60,7 @@ public class ConfiguracaoMaquinaModel {
 
     @Column(name = "usuario_id", nullable = false)
     @Schema(description = "ID do usuário que criou a configuração", example = "1")
-    private Long usuarioId;
+    private Integer usuarioId;
 
 
 

@@ -19,19 +19,19 @@ public interface PneuVulcanizadoRepository extends CrudRepository<PneuVulcanizad
      * Busca pneus vulcanizados por usuário
      */
     @Query("SELECT p FROM PneuVulcanizadoModel p WHERE p.usuarioId = :usuarioId AND p.dtDelete IS NULL ORDER BY p.dtCreate DESC")
-    List<PneuVulcanizadoModel> findByUsuarioId(@Param("usuarioId") Long usuarioId);
+    List<PneuVulcanizadoModel> findByUsuarioId(@Param("usuarioId") Integer usuarioId);
 
     /**
      * Busca pneus vulcanizados por usuário com paginação
      */
     @Query("SELECT p FROM PneuVulcanizadoModel p WHERE p.usuarioId = :usuarioId AND p.dtDelete IS NULL ORDER BY p.dtCreate DESC")
-    Page<PneuVulcanizadoModel> findByUsuarioId(@Param("usuarioId") Long usuarioId, Pageable pageable);
+    Page<PneuVulcanizadoModel> findByUsuarioId(@Param("usuarioId") Integer usuarioId, Pageable pageable);
 
     /**
      * Busca pneus vulcanizados por produção
      */
     @Query("SELECT p FROM PneuVulcanizadoModel p WHERE p.producaoId = :producaoId AND p.dtDelete IS NULL ORDER BY p.dtCreate DESC")
-    List<PneuVulcanizadoModel> findByProducaoId(@Param("producaoId") Long producaoId);
+    List<PneuVulcanizadoModel> findByProducaoId(@Param("producaoId") Integer producaoId);
 
     /**
      * Busca pneus vulcanizados por status
@@ -49,19 +49,19 @@ public interface PneuVulcanizadoRepository extends CrudRepository<PneuVulcanizad
      * Busca pneus vulcanizados por usuário e status
      */
     @Query("SELECT p FROM PneuVulcanizadoModel p WHERE p.usuarioId = :usuarioId AND p.status = :status AND p.dtDelete IS NULL ORDER BY p.dtCreate DESC")
-    List<PneuVulcanizadoModel> findByUsuarioIdAndStatus(@Param("usuarioId") Long usuarioId, @Param("status") StatusVulcanizacao status);
+    List<PneuVulcanizadoModel> findByUsuarioIdAndStatus(@Param("usuarioId") Integer usuarioId, @Param("status") StatusVulcanizacao status);
 
     /**
      * Busca pneus vulcanizados por usuário e status com paginação
      */
     @Query("SELECT p FROM PneuVulcanizadoModel p WHERE p.usuarioId = :usuarioId AND p.status = :status AND p.dtDelete IS NULL ORDER BY p.dtCreate DESC")
-    Page<PneuVulcanizadoModel> findByUsuarioIdAndStatus(@Param("usuarioId") Long usuarioId, @Param("status") StatusVulcanizacao status, Pageable pageable);
+    Page<PneuVulcanizadoModel> findByUsuarioIdAndStatus(@Param("usuarioId") Integer usuarioId, @Param("status") StatusVulcanizacao status, Pageable pageable);
 
     /**
      * Busca pneu vulcanizado específico por usuário e produção
      */
     @Query("SELECT p FROM PneuVulcanizadoModel p WHERE p.usuarioId = :usuarioId AND p.producaoId = :producaoId AND p.dtDelete IS NULL")
-    Optional<PneuVulcanizadoModel> findByUsuarioIdAndProducaoId(@Param("usuarioId") Long usuarioId, @Param("producaoId") Long producaoId);
+    Optional<PneuVulcanizadoModel> findByUsuarioIdAndProducaoId(@Param("usuarioId") Integer usuarioId, @Param("producaoId") Integer producaoId);
 
     /**
      * Busca todos os pneus vulcanizados ativos com paginação
@@ -79,11 +79,11 @@ public interface PneuVulcanizadoRepository extends CrudRepository<PneuVulcanizad
      * Conta pneus vulcanizados por usuário
      */
     @Query("SELECT COUNT(p) FROM PneuVulcanizadoModel p WHERE p.usuarioId = :usuarioId AND p.dtDelete IS NULL")
-    Long countByUsuarioId(@Param("usuarioId") Long usuarioId);
+    Long countByUsuarioId(@Param("usuarioId") Integer usuarioId);
 
     /**
      * Conta pneus vulcanizados finalizados para uma determinada produção
      */
     @Query("SELECT COUNT(p) FROM PneuVulcanizadoModel p WHERE p.producaoId = :producaoId AND p.status = :status AND p.dtDelete IS NULL")
-    Long countByProducaoIdAndStatus(@Param("producaoId") Long producaoId, @Param("status") StatusVulcanizacao status);
+    Long countByProducaoIdAndStatus(@Param("producaoId") Integer producaoId, @Param("status") StatusVulcanizacao status);
 }

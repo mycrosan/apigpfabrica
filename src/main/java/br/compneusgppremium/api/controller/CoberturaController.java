@@ -81,7 +81,7 @@ public class CoberturaController {
             }
 
             // Define usuário logado como responsável
-            Long userId = usuarioLogadoUtil.getUsuarioIdLogado();
+            Integer userId = usuarioLogadoUtil.getUsuarioIdLogado();
             UsuarioModel usuario = usuarioRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
@@ -242,7 +242,7 @@ public class CoberturaController {
             if (coberturaExistente != null) {
                 usuario = coberturaExistente.getUsuario();
             } else {
-                Long userId = usuarioLogadoUtil.getUsuarioIdLogado();
+                Integer userId = usuarioLogadoUtil.getUsuarioIdLogado();
                 usuario = usuarioRepository.findById(userId)
                         .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
             }

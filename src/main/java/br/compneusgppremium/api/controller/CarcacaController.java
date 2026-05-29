@@ -157,7 +157,7 @@ public class CarcacaController {
             carcaca.setDt_update(new Date());
             carcaca.setUuid(UUID.randomUUID());
 
-            Long usuarioId = usuarioLogadoUtil.getUsuarioIdLogado();
+            Integer usuarioId = usuarioLogadoUtil.getUsuarioIdLogado();
             UsuarioModel usuario = usuarioRepository.findById(usuarioId)
                     .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
             carcaca.setCriadoPor(usuario);

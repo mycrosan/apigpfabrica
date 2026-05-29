@@ -38,7 +38,7 @@ public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
 
 	private void autenticarCliente(String token) {
 		try {
-			Long idUsuario = tokenService.getIdUsuario(token);
+			Integer idUsuario = tokenService.getIdUsuario(token);
 
 			repository.findById(idUsuario).ifPresent(usuarioModel -> {
 				UsernamePasswordAuthenticationToken authentication =

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface MotoristaRepository extends JpaRepository<MotoristaModel, Integer> {
     Optional<MotoristaModel> findByIdAndAtivoTrue(Integer id);
-    boolean existsByUsuarioId(Long usuarioId);
+    boolean existsByUsuarioId(Integer usuarioId);
     boolean existsByCpf(String cpf);
 
     @Query("SELECT m FROM motorista m WHERE (:ativo IS NULL OR m.ativo = :ativo) ORDER BY m.dataCriacao DESC")

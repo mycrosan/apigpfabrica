@@ -41,7 +41,7 @@ public class ConfiguracaoMaquinaResponseDTO {
     private LocalDateTime dtUpdate;
 
     @Schema(description = "ID do usuário que criou a configuração", example = "1")
-    private Long usuarioId;
+    private Integer usuarioId;
 
     // Construtores
     public ConfiguracaoMaquinaResponseDTO() {}
@@ -49,7 +49,7 @@ public class ConfiguracaoMaquinaResponseDTO {
     public ConfiguracaoMaquinaResponseDTO(Long id, String celularId, String descricao,
                                          String atributos, Integer matrizId, String matrizNome,
                                          Long maquinaId, String maquinaNome,
-                                         LocalDateTime dtCreate, LocalDateTime dtUpdate, Long usuarioId) {
+                                         LocalDateTime dtCreate, LocalDateTime dtUpdate, Integer usuarioId) {
         this.id = id;
         this.celularId = celularId;
         this.descricao = descricao;
@@ -144,11 +144,11 @@ public class ConfiguracaoMaquinaResponseDTO {
         this.dtUpdate = dtUpdate;
     }
 
-    public Long getUsuarioId() {
+    public Integer getUsuarioId() {
         return usuarioId;
     }
 
-    public void setUsuarioId(Long usuarioId) {
+    public void setUsuarioId(Integer usuarioId) {
         this.usuarioId = usuarioId;
     }
 }

@@ -68,7 +68,7 @@ public class ConfiguracaoMaquinaControllerTest {
         when(matrizRepository.findById(1)).thenReturn(Optional.of(matriz));
 
         // Mock do usuário logado
-        when(usuarioLogadoUtil.getUsuarioIdLogado()).thenReturn(1L);
+        when(usuarioLogadoUtil.getUsuarioIdLogado()).thenReturn(1);
 
         // Mock do save - captura o objeto que será salvo
         when(configuracaoMaquinaRepository.save(any(ConfiguracaoMaquinaModel.class)))
@@ -226,7 +226,7 @@ public class ConfiguracaoMaquinaControllerTest {
         when(matrizRepository.findById(1)).thenReturn(Optional.of(matriz));
 
         // Mock do usuário logado
-        when(usuarioLogadoUtil.getUsuarioIdLogado()).thenReturn(1L);
+        when(usuarioLogadoUtil.getUsuarioIdLogado()).thenReturn(1);
 
         // Mock do save
         ConfiguracaoMaquinaModel savedConfig = new ConfiguracaoMaquinaModel();

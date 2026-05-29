@@ -10,7 +10,7 @@
     </parent>
     <groupId>br.compneusgppremium</groupId>
     <artifactId>gp-premium</artifactId>
-    <version>1.7.0</version>
+    <version>1.10.1</version>
     <packaging>war</packaging>
     <name>GP Premium</name>
     <description>Api GP</description>
@@ -63,11 +63,6 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-            <version>1.5.5.Final</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <exclusions>
@@ -104,17 +99,6 @@
             </exclusions>
         </dependency>
         
-        <!-- Adiciona dependência do Undertow -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-undertow</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.undertow</groupId>
-                    <artifactId>undertow-websockets-jsr</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
@@ -172,25 +156,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M9</version>
-                <configuration>
-                    <!-- Configuração para saída limpa dos testes -->
-                    <printSummary>true</printSummary>
-                    <useFile>false</useFile>
-                    <trimStackTrace>false</trimStackTrace>
-                    <reportFormat>brief</reportFormat>
-                    <consoleOutputReporter>
-                        <disable>false</disable>
-                    </consoleOutputReporter>
-                    <statelessTestsetInfoReporter>
-                        <disable>false</disable>
-                    </statelessTestsetInfoReporter>
-                    <!-- Reduzir verbosidade -->
-                    <redirectTestOutputToFile>false</redirectTestOutputToFile>
-                    <systemPropertyVariables>
-                        <spring.profiles.active>test</spring.profiles.active>
-                    </systemPropertyVariables>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -203,6 +168,7 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
 
@@ -279,18 +245,6 @@
                     <source>11</source>
                     <target>11</target>
                     <encoding>UTF-8</encoding>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>1.18.20</version>
-                        </path>
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>1.5.5.Final</version>
-                        </path>
-                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
 
@@ -349,6 +303,21 @@
             </dependencies>
             <build>
                 <plugins>
+                    <!-- Desativa o repackage do Spring Boot neste profile para gerar WAR clássico -->
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <!-- Opcional: deploy automático no WildFly durante 'install' -->
                     <plugin>
                         <groupId>org.wildfly.plugins</groupId>
