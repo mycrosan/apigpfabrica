@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface RegistroMaquinaRepository extends JpaRepository<RegistroMaquinaModel, Long> {
+public interface RegistroMaquinaRepository extends JpaRepository<RegistroMaquinaModel, Integer> {
 
     // Buscar por nome
     Optional<RegistroMaquinaModel> findByNomeAndDtDeleteIsNull(String nome);
@@ -23,7 +23,7 @@ public interface RegistroMaquinaRepository extends JpaRepository<RegistroMaquina
     List<RegistroMaquinaModel> findByStatusAndDtDeleteIsNullOrderByDtCreateDesc(StatusMaquina status);
 
     // Buscar por ID não deletado
-    Optional<RegistroMaquinaModel> findByIdAndDtDeleteIsNull(Long id);
+    Optional<RegistroMaquinaModel> findByIdAndDtDeleteIsNull(Integer id);
 
     // Buscar máquinas em manutenção
     List<RegistroMaquinaModel> findByStatusAndDtDeleteIsNull(StatusMaquina status);
@@ -33,14 +33,14 @@ public interface RegistroMaquinaRepository extends JpaRepository<RegistroMaquina
 
     // Verificar se nome já existe para outro registro (para atualização)
     @Query("SELECT COUNT(r) > 0 FROM maquina_registro r WHERE r.nome = :nome AND r.id != :id AND r.dtDelete IS NULL")
-    boolean existsByNomeAndIdNotAndDtDeleteIsNull(@Param("nome") String nome, @Param("id") Long id);
+    boolean existsByNomeAndIdNotAndDtDeleteIsNull(@Param("nome") String nome, @Param("id") Integer id);
 
     // Verificar se número de série já existe
     boolean existsByNumeroSerieAndDtDeleteIsNull(String numeroSerie);
 
     // Verificar se número de série já existe para outro registro (para atualização)
     @Query("SELECT COUNT(r) > 0 FROM maquina_registro r WHERE r.numeroSerie = :numeroSerie AND r.id != :id AND r.dtDelete IS NULL")
-    boolean existsByNumeroSerieAndIdNotAndDtDeleteIsNull(@Param("numeroSerie") String numeroSerie, @Param("id") Long id);
+    boolean existsByNumeroSerieAndIdNotAndDtDeleteIsNull(@Param("numeroSerie") String numeroSerie, @Param("id") Integer id);
 
     // Listar máquinas disponíveis para configuração de relé (não associadas a nenhum Sonoff ativo)
     @Query("SELECT r FROM maquina_registro r WHERE r.dtDelete IS NULL AND NOT EXISTS (SELECT s FROM rele s WHERE s.dtDelete IS NULL AND s.maquina.id = r.id) ORDER BY r.dtCreate DESC")

@@ -20,5 +20,5 @@ public class ReleCreateDTO {
 
     @NotNull(message = "Máquina (ID) é obrigatória")
     @Schema(description = "ID da máquina associada (FK)", example = "1")
-    private Long maquinaId;
+    private Integer maquinaId;
 }

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Schema(description = "Resposta para dispositivo Rele")
 public class ReleResponseDTO {
     @Schema(description = "ID do dispositivo", example = "1")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "IP do dispositivo", example = "192.168.0.50")
     private String ip;
@@ -22,7 +22,7 @@ public class ReleResponseDTO {
     private String celularId;
 
     @Schema(description = "ID da máquina associada (FK)", example = "1")
-    private Long maquinaId;
+    private Integer maquinaId;
 
     @Schema(description = "Nome da máquina associada", example = "Maquina 1")
     private String maquinaNome;

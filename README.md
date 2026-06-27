@@ -188,6 +188,9 @@ mvn clean package -P wildfly -DskipTests
 
 $2a$10$MamUEkkHyKUiSwL7PNhw..NmFYqHt.ZMsHfQR1AehHsZ/irX4pfKKß
 
+sudo lsof -t -i:8080 | xargs kill -9
+
+
 
 
 

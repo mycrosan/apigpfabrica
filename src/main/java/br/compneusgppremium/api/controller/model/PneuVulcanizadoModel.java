@@ -19,7 +19,7 @@ public class PneuVulcanizadoModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "ID único do pneu vulcanizado", example = "1")
-    private Long id;
+    private Integer id;
 
     @Column(name = "usuario_id", nullable = false)
     @Schema(description = "ID do usuário responsável pela vulcanização", example = "1")

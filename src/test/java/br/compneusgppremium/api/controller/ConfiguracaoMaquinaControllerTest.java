@@ -49,7 +49,7 @@ public class ConfiguracaoMaquinaControllerTest {
     public void testCriarConfiguracao_ComMatrizValida_DeveDefinirMatrizCorretamente() {
         // Arrange
         ConfiguracaoMaquinaCreateDTO dto = new ConfiguracaoMaquinaCreateDTO();
-        dto.setMaquinaId(1L);
+        dto.setMaquinaId(1);
         dto.setMatrizId(1);
         dto.setCelularId("CEL001");
         dto.setDescricao("Configuração de produção");
@@ -57,9 +57,9 @@ public class ConfiguracaoMaquinaControllerTest {
 
         // Mock da máquina - usando o método correto do controller
         RegistroMaquinaModel maquina = new RegistroMaquinaModel();
-        maquina.setId(1L);
+        maquina.setId(1);
         maquina.setNome("Máquina Teste");
-        when(registroMaquinaRepository.findByIdAndDtDeleteIsNull(1L)).thenReturn(Optional.of(maquina));
+        when(registroMaquinaRepository.findByIdAndDtDeleteIsNull(1)).thenReturn(Optional.of(maquina));
 
         // Mock da matriz
         MatrizModel matriz = new MatrizModel();
@@ -74,7 +74,7 @@ public class ConfiguracaoMaquinaControllerTest {
         when(configuracaoMaquinaRepository.save(any(ConfiguracaoMaquinaModel.class)))
             .thenAnswer(invocation -> {
                 ConfiguracaoMaquinaModel config = invocation.getArgument(0);
-                config.setId(1L);
+                config.setId(1);
                 return config;
             });
 
@@ -92,7 +92,7 @@ public class ConfiguracaoMaquinaControllerTest {
     public void testCriarConfiguracao_ComMatrizInexistente_DeveRetornarNotFound() {
         // Arrange
         ConfiguracaoMaquinaCreateDTO dto = new ConfiguracaoMaquinaCreateDTO();
-        dto.setMaquinaId(1L);
+        dto.setMaquinaId(1);
         dto.setMatrizId(999); // ID inexistente
         dto.setCelularId("CEL001");
         dto.setDescricao("Configuração de produção");
@@ -100,9 +100,9 @@ public class ConfiguracaoMaquinaControllerTest {
 
         // Mock da máquina - usando o método correto do controller
         RegistroMaquinaModel maquina = new RegistroMaquinaModel();
-        maquina.setId(1L);
+        maquina.setId(1);
         maquina.setNome("Máquina Teste");
-        when(registroMaquinaRepository.findByIdAndDtDeleteIsNull(1L)).thenReturn(Optional.of(maquina));
+        when(registroMaquinaRepository.findByIdAndDtDeleteIsNull(1)).thenReturn(Optional.of(maquina));
 
         // Mock da matriz inexistente
         when(matrizRepository.findById(999)).thenReturn(Optional.empty());
@@ -120,13 +120,13 @@ public class ConfiguracaoMaquinaControllerTest {
         String celularId = "CEL001";
         
         ConfiguracaoMaquinaModel configuracaoAtiva = new ConfiguracaoMaquinaModel();
-        configuracaoAtiva.setId(1L);
+        configuracaoAtiva.setId(1);
         configuracaoAtiva.setCelularId(celularId);
         configuracaoAtiva.setDescricao("Configuração mais recente");
         configuracaoAtiva.setDtCreate(LocalDateTime.now());
         
         RegistroMaquinaModel maquina = new RegistroMaquinaModel();
-        maquina.setId(1L);
+        maquina.setId(1);
         maquina.setNome("Máquina Teste");
         configuracaoAtiva.setMaquina(maquina);
         
@@ -166,20 +166,20 @@ public class ConfiguracaoMaquinaControllerTest {
         String celularId = "CEL001";
         
         ConfiguracaoMaquinaModel config1 = new ConfiguracaoMaquinaModel();
-        config1.setId(1L);
+        config1.setId(1);
         config1.setCelularId(celularId);
         config1.setDescricao("Configuração antiga");
         config1.setDtCreate(LocalDateTime.now().minusDays(2));
         
         ConfiguracaoMaquinaModel config2 = new ConfiguracaoMaquinaModel();
-        config2.setId(2L);
+        config2.setId(2);
         config2.setCelularId(celularId);
         config2.setDescricao("Configuração recente");
         config2.setDtCreate(LocalDateTime.now());
         
         // Mock das entidades relacionadas
         RegistroMaquinaModel maquina = new RegistroMaquinaModel();
-        maquina.setId(1L);
+        maquina.setId(1);
         maquina.setNome("Máquina Teste");
         config1.setMaquina(maquina);
         config2.setMaquina(maquina);
@@ -207,7 +207,7 @@ public class ConfiguracaoMaquinaControllerTest {
     public void testCriarMultiplasConfiguracoesMesmoCelular_DevePermitirCriacao() {
         // Arrange - Primeira configuração
         ConfiguracaoMaquinaCreateDTO dto1 = new ConfiguracaoMaquinaCreateDTO();
-        dto1.setMaquinaId(1L);
+        dto1.setMaquinaId(1);
         dto1.setMatrizId(1);
         dto1.setCelularId("CEL001");
         dto1.setDescricao("Primeira configuração");
@@ -215,9 +215,9 @@ public class ConfiguracaoMaquinaControllerTest {
 
         // Mock da máquina
         RegistroMaquinaModel maquina = new RegistroMaquinaModel();
-        maquina.setId(1L);
+        maquina.setId(1);
         maquina.setNome("Máquina Teste");
-        when(registroMaquinaRepository.findByIdAndDtDeleteIsNull(1L)).thenReturn(Optional.of(maquina));
+        when(registroMaquinaRepository.findByIdAndDtDeleteIsNull(1)).thenReturn(Optional.of(maquina));
 
         // Mock da matriz
         MatrizModel matriz = new MatrizModel();
@@ -230,7 +230,7 @@ public class ConfiguracaoMaquinaControllerTest {
 
         // Mock do save
         ConfiguracaoMaquinaModel savedConfig = new ConfiguracaoMaquinaModel();
-        savedConfig.setId(1L);
+        savedConfig.setId(1);
         savedConfig.setCelularId("CEL001");
         savedConfig.setMaquina(maquina);
         savedConfig.setMatriz(matriz);
@@ -245,7 +245,7 @@ public class ConfiguracaoMaquinaControllerTest {
 
         // Arrange - Segunda configuração para o mesmo celular
         ConfiguracaoMaquinaCreateDTO dto2 = new ConfiguracaoMaquinaCreateDTO();
-        dto2.setMaquinaId(1L);
+        dto2.setMaquinaId(1);
         dto2.setMatrizId(2);
         dto2.setCelularId("CEL001"); // Mesmo celular
         dto2.setDescricao("Segunda configuração");
@@ -259,7 +259,7 @@ public class ConfiguracaoMaquinaControllerTest {
 
         // Mock do save para segunda configuração
         ConfiguracaoMaquinaModel savedConfig2 = new ConfiguracaoMaquinaModel();
-        savedConfig2.setId(2L);
+        savedConfig2.setId(2);
         savedConfig2.setCelularId("CEL001");
         savedConfig2.setMaquina(maquina);
         savedConfig2.setMatriz(matriz2);
@@ -276,20 +276,20 @@ public class ConfiguracaoMaquinaControllerTest {
     @Test
     public void testDeletarConfiguracao_ComConfiguracaoExistente_DeveRealizarSoftDelete() {
         // Arrange
-        Long configId = 1L;
+        Integer configId = 1;
         ConfiguracaoMaquinaModel configuracao = new ConfiguracaoMaquinaModel();
         configuracao.setId(configId);
         configuracao.setCelularId("CEL001");
         
         RegistroMaquinaModel maquina = new RegistroMaquinaModel();
-        maquina.setId(1L);
+        maquina.setId(1);
         configuracao.setMaquina(maquina);
 
         when(configuracaoMaquinaRepository.findByIdAndDtDeleteIsNull(configId))
                 .thenReturn(Optional.of(configuracao));
         when(configuracaoMaquinaRepository.save(any(ConfiguracaoMaquinaModel.class)))
                 .thenReturn(configuracao);
-        when(configuracaoMaquinaRepository.findPreviousActiveBymaquinaIdExcludingId(1L, configId))
+        when(configuracaoMaquinaRepository.findPreviousActiveBymaquinaIdExcludingId(1, configId))
                 .thenReturn(Optional.empty());
 
         // Act
@@ -303,7 +303,7 @@ public class ConfiguracaoMaquinaControllerTest {
     @Test
     public void testDeletarConfiguracao_ComConfiguracaoInexistente_DeveRetornarNotFound() {
         // Arrange
-        Long configId = 999L;
+        Integer configId = 999;
         when(configuracaoMaquinaRepository.findByIdAndDtDeleteIsNull(configId))
                 .thenReturn(Optional.empty());
 
@@ -317,8 +317,8 @@ public class ConfiguracaoMaquinaControllerTest {
     @Test
     public void testDeletarConfiguracao_ComConfiguracaoAnteriorExistente_DeveManterConfiguracaoAnteriorAtiva() {
         // Arrange
-        Long configAtualId = 2L;
-        Long configAnteriorId = 1L;
+        Integer configAtualId = 2;
+        Integer configAnteriorId = 1;
         
         // Configuração atual (a ser deletada)
         ConfiguracaoMaquinaModel configAtual = new ConfiguracaoMaquinaModel();
@@ -327,7 +327,7 @@ public class ConfiguracaoMaquinaControllerTest {
         configAtual.setDtCreate(LocalDateTime.now());
         
         RegistroMaquinaModel maquina = new RegistroMaquinaModel();
-        maquina.setId(1L);
+        maquina.setId(1);
         configAtual.setMaquina(maquina);
 
         // Configuração anterior (deve permanecer ativa)
@@ -341,7 +341,7 @@ public class ConfiguracaoMaquinaControllerTest {
                 .thenReturn(Optional.of(configAtual));
         when(configuracaoMaquinaRepository.save(any(ConfiguracaoMaquinaModel.class)))
                 .thenReturn(configAtual);
-        when(configuracaoMaquinaRepository.findPreviousActiveBymaquinaIdExcludingId(1L, configAtualId))
+        when(configuracaoMaquinaRepository.findPreviousActiveBymaquinaIdExcludingId(1, configAtualId))
                 .thenReturn(Optional.of(configAnterior));
 
         // Act
@@ -356,20 +356,20 @@ public class ConfiguracaoMaquinaControllerTest {
     @Test
     public void testDeletarConfiguracao_SemConfiguracaoAnterior_DeveApenasRealizarSoftDelete() {
         // Arrange
-        Long configId = 1L;
+        Integer configId = 1;
         ConfiguracaoMaquinaModel configuracao = new ConfiguracaoMaquinaModel();
         configuracao.setId(configId);
         configuracao.setCelularId("CEL001");
         
         RegistroMaquinaModel maquina = new RegistroMaquinaModel();
-        maquina.setId(1L);
+        maquina.setId(1);
         configuracao.setMaquina(maquina);
 
         when(configuracaoMaquinaRepository.findByIdAndDtDeleteIsNull(configId))
                 .thenReturn(Optional.of(configuracao));
         when(configuracaoMaquinaRepository.save(any(ConfiguracaoMaquinaModel.class)))
                 .thenReturn(configuracao);
-        when(configuracaoMaquinaRepository.findPreviousActiveBymaquinaIdExcludingId(1L, configId))
+        when(configuracaoMaquinaRepository.findPreviousActiveBymaquinaIdExcludingId(1, configId))
                 .thenReturn(Optional.empty()); // Não há configuração anterior
 
         // Act
@@ -387,7 +387,7 @@ public class ConfiguracaoMaquinaControllerTest {
         when(configuracaoMaquinaRepository.findAll()).thenReturn(Arrays.asList());
         
         // Mock para findById
-        when(configuracaoMaquinaRepository.findById(12L)).thenReturn(Optional.empty());
+        when(configuracaoMaquinaRepository.findById(12)).thenReturn(Optional.empty());
         
         // Mock para findByDtDeleteIsNullOrderByDtCreateDesc
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 100);
@@ -400,7 +400,7 @@ public class ConfiguracaoMaquinaControllerTest {
         List<ConfiguracaoMaquinaModel> todasConfiguracoes = configuracaoMaquinaRepository.findAll();
         
         // Verificar especificamente a configuração ID 12
-        Optional<ConfiguracaoMaquinaModel> config12 = configuracaoMaquinaRepository.findById(12L);
+        Optional<ConfiguracaoMaquinaModel> config12 = configuracaoMaquinaRepository.findById(12);
         assertFalse(config12.isPresent(), "Configuração ID 12 não deve existir no mock");
         
         // Buscar apenas configurações ativas usando paginação

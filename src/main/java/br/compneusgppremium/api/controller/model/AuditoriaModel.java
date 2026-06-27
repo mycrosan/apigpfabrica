@@ -10,13 +10,13 @@ import java.util.Date;
 public class AuditoriaModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(name = "tabela_afetada", nullable = false)
     private String tabelaAfetada;
 
     @Column(name = "registro_id", nullable = false)
-    private Long registroId;
+    private Integer registroId;
 
     @Column(name = "acao", nullable = false)
     private String acao; // INSERT, UPDATE, INATIVAR
@@ -29,4 +29,3 @@ public class AuditoriaModel {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataAcao;
 }
-

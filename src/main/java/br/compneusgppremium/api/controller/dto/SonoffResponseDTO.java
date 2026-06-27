@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Schema(description = "Resposta para dispositivo Sonoff")
 public class SonoffResponseDTO {
     @Schema(description = "ID do dispositivo", example = "1")
-    private Long id;
+    private Integer id;
     @Schema(description = "Nome do dispositivo", example = "Sonoff Sala")
     private String nome;
     @Schema(description = "IP do dispositivo", example = "192.168.0.50")

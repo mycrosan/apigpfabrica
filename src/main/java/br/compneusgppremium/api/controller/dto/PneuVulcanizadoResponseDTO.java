@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class PneuVulcanizadoResponseDTO {
 
     @Schema(description = "ID único do pneu vulcanizado", example = "1")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "ID do usuário responsável", example = "1")
     private Integer usuarioId;
@@ -38,7 +38,7 @@ public class PneuVulcanizadoResponseDTO {
     // Construtores
     public PneuVulcanizadoResponseDTO() {}
 
-    public PneuVulcanizadoResponseDTO(Long id, Integer usuarioId, String usuarioNome, 
+    public PneuVulcanizadoResponseDTO(Integer id, Integer usuarioId, String usuarioNome,
                                      Integer producaoId, String numeroEtiqueta, StatusVulcanizacao status, 
                                      LocalDateTime dtCreate, LocalDateTime dtUpdate) {
         this.id = id;
@@ -52,11 +52,11 @@ public class PneuVulcanizadoResponseDTO {
     }
 
     // Getters e Setters
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

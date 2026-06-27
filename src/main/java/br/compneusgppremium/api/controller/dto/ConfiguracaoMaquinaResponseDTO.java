@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class ConfiguracaoMaquinaResponseDTO {
 
     @Schema(description = "ID da configuração", example = "1")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "ID do celular", example = "CEL001")
     private String celularId;
@@ -29,7 +29,7 @@ public class ConfiguracaoMaquinaResponseDTO {
     private String matrizNome;
 
     @Schema(description = "ID da máquina", example = "1")
-    private Long maquinaId;
+    private Integer maquinaId;
 
     @Schema(description = "Nome da máquina", example = "Máquina de Produção 01")
     private String maquinaNome;
@@ -46,9 +46,9 @@ public class ConfiguracaoMaquinaResponseDTO {
     // Construtores
     public ConfiguracaoMaquinaResponseDTO() {}
 
-    public ConfiguracaoMaquinaResponseDTO(Long id, String celularId, String descricao,
+    public ConfiguracaoMaquinaResponseDTO(Integer id, String celularId, String descricao,
                                          String atributos, Integer matrizId, String matrizNome,
-                                         Long maquinaId, String maquinaNome,
+                                         Integer maquinaId, String maquinaNome,
                                          LocalDateTime dtCreate, LocalDateTime dtUpdate, Integer usuarioId) {
         this.id = id;
         this.celularId = celularId;
@@ -64,11 +64,11 @@ public class ConfiguracaoMaquinaResponseDTO {
     }
 
     // Getters e Setters
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -112,11 +112,11 @@ public class ConfiguracaoMaquinaResponseDTO {
         this.matrizNome = matrizNome;
     }
 
-    public Long getMaquinaId() {
+    public Integer getMaquinaId() {
         return maquinaId;
     }
 
-    public void setMaquinaId(Long maquinaId) {
+    public void setMaquinaId(Integer maquinaId) {
         this.maquinaId = maquinaId;
     }
 

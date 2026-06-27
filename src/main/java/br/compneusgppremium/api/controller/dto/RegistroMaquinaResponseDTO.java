@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class RegistroMaquinaResponseDTO {
 
     @Schema(description = "ID único do registro da máquina", example = "1")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "Nome da máquina", example = "Máquina de Produção 01")
     private String nome;

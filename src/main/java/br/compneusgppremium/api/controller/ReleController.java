@@ -83,7 +83,7 @@ public class ReleController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
     public ResponseEntity<?> atualizar(@Parameter(description = "ID do dispositivo Rele", required = true, example = "1")
-                                         @PathVariable("id") Long id,
+                                         @PathVariable("id") Integer id,
                                          @Valid @RequestBody ReleCreateDTO dto) {
         try {
             ReleResponseDTO response = releService.atualizar(id, dto);
@@ -107,7 +107,7 @@ public class ReleController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
     public ResponseEntity<?> excluir(@Parameter(description = "ID do dispositivo Rele", required = true, example = "1")
-                                       @PathVariable("id") Long id) {
+                                       @PathVariable("id") Integer id) {
         try {
             releService.excluir(id);
             return ResponseEntity.ok().build();

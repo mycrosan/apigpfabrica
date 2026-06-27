@@ -22,7 +22,7 @@ public class ConfiguracaoMaquinaModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "ID único da configuração", example = "1")
-    private Long id;
+    private Integer id;
 
     @Column(name = "celular_id", nullable = false, length = 100)
     @Schema(description = "ID do celular", example = "CEL001")

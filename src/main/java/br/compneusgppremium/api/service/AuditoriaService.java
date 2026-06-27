@@ -17,7 +17,7 @@ public class AuditoriaService {
     private final UsuarioLogadoUtil usuarioLogadoUtil;
 
     @Transactional
-    public void registrar(String tabelaAfetada, Long registroId, String acao, UsuarioModel usuario) {
+    public void registrar(String tabelaAfetada, Integer registroId, String acao, UsuarioModel usuario) {
         AuditoriaModel audit = new AuditoriaModel();
         audit.setTabelaAfetada(tabelaAfetada);
         audit.setRegistroId(registroId);
@@ -27,4 +27,3 @@ public class AuditoriaService {
         auditoriaRepository.save(audit);
     }
 }
-

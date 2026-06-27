@@ -63,7 +63,7 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `gppremium`.`pneus_vulcanizados` (
-  `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `dt_create` DATETIME NOT NULL,
   `dt_delete` DATETIME NULL DEFAULT NULL,
   `dt_update` DATETIME NULL DEFAULT NULL,
@@ -91,7 +91,7 @@ COLLATE = utf8mb4_0900_ai_ci
 COMMENT = 'Tabela para controle de pneus vulcanizados por usuário e produção';
 
 CREATE TABLE IF NOT EXISTS `gppremium`.`rele` (
-  `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `dt_create` DATETIME NOT NULL,
   `dt_delete` DATETIME NULL DEFAULT NULL,
   `dt_update` DATETIME NULL DEFAULT NULL,

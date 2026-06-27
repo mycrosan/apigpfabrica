@@ -15,7 +15,7 @@ import java.util.Optional;
  * Repository para operações de ConfiguracaoMaquinaModel
  */
 @Repository
-public interface ConfiguracaoMaquinaRepository extends JpaRepository<ConfiguracaoMaquinaModel, Long> {
+public interface ConfiguracaoMaquinaRepository extends JpaRepository<ConfiguracaoMaquinaModel, Integer> {
 
     /**
      * Busca configuração por ID excluindo registros deletados
@@ -24,7 +24,7 @@ public interface ConfiguracaoMaquinaRepository extends JpaRepository<Configuraca
            "LEFT JOIN FETCH c.matriz " +
            "LEFT JOIN FETCH c.maquina " +
            "WHERE c.id = :id AND c.dtDelete IS NULL")
-    Optional<ConfiguracaoMaquinaModel> findByIdAndDtDeleteIsNull(@Param("id") Long id);
+    Optional<ConfiguracaoMaquinaModel> findByIdAndDtDeleteIsNull(@Param("id") Integer id);
 
     /**
      * Busca todas as configurações excluindo registros deletados, ordenadas por data de criação
@@ -40,13 +40,13 @@ public interface ConfiguracaoMaquinaRepository extends JpaRepository<Configuraca
      * Busca configurações por ID da máquina excluindo registros deletados, ordenadas por data de criação
      */
     @Query("SELECT c FROM maquina_configuracao c WHERE c.maquina.id = :maquinaId AND c.dtDelete IS NULL ORDER BY c.dtCreate DESC")
-    Page<ConfiguracaoMaquinaModel> findByMaquinaIdAndDtDeleteIsNullOrderByDtCreateDesc(@Param("maquinaId") Long maquinaId, Pageable pageable);
+    Page<ConfiguracaoMaquinaModel> findByMaquinaIdAndDtDeleteIsNullOrderByDtCreateDesc(@Param("maquinaId") Integer maquinaId, Pageable pageable);
 
     /**
      * Busca configurações por ID da máquina excluindo registros deletados
      */
     @Query("SELECT c FROM maquina_configuracao c WHERE c.maquina.id = :maquinaId AND c.dtDelete IS NULL")
-    List<ConfiguracaoMaquinaModel> findByMaquinaIdAndDtDeleteIsNull(@Param("maquinaId") Long maquinaId);
+    List<ConfiguracaoMaquinaModel> findByMaquinaIdAndDtDeleteIsNull(@Param("maquinaId") Integer maquinaId);
 
     /**
      * Busca a configuração ativa (mais recente) por celularId excluindo registros deletados
@@ -69,7 +69,7 @@ public interface ConfiguracaoMaquinaRepository extends JpaRepository<Configuraca
      * Busca configurações por ID da matriz excluindo registros deletados
      */
     @Query("SELECT c FROM maquina_configuracao c WHERE c.matriz.id = :matrizId AND c.dtDelete IS NULL")
-    List<ConfiguracaoMaquinaModel> findByMatrizIdAndDtDeleteIsNull(@Param("matrizId") Long matrizId);
+    List<ConfiguracaoMaquinaModel> findByMatrizIdAndDtDeleteIsNull(@Param("matrizId") Integer matrizId);
 
     /**
      * Busca configurações por celular ID excluindo registros deletados
@@ -90,8 +90,8 @@ public interface ConfiguracaoMaquinaRepository extends JpaRepository<Configuraca
      */
     @Query("SELECT c FROM maquina_configuracao c WHERE c.maquina.id = :maquinaId AND c.matriz.id = :matrizId AND c.dtDelete IS NULL")
     List<ConfiguracaoMaquinaModel> findByMaquinaIdAndMatrizIdAndDtDeleteIsNull(
-            @Param("maquinaId") Long maquinaId, 
-            @Param("matrizId") Long matrizId);
+            @Param("maquinaId") Integer maquinaId,
+            @Param("matrizId") Integer matrizId);
 
     /**
      * Verifica se existe configuração com celular ID para uma máquina específica (exceto o ID fornecido)
@@ -102,9 +102,9 @@ public interface ConfiguracaoMaquinaRepository extends JpaRepository<Configuraca
            "c.id != :id AND " +
            "c.dtDelete IS NULL")
     boolean existsByMaquinaIdAndCelularIdAndIdNotAndDtDeleteIsNull(
-            @Param("maquinaId") Long maquinaId,
+            @Param("maquinaId") Integer maquinaId,
             @Param("celularId") String celularId,
-            @Param("id") Long id);
+            @Param("id") Integer id);
 
     /**
      * Verifica se existe configuração com celular ID para uma máquina específica
@@ -114,7 +114,7 @@ public interface ConfiguracaoMaquinaRepository extends JpaRepository<Configuraca
            "c.celularId = :celularId AND " +
            "c.dtDelete IS NULL")
     boolean existsByMaquinaIdAndCelularIdAndDtDeleteIsNull(
-            @Param("maquinaId") Long maquinaId,
+            @Param("maquinaId") Integer maquinaId,
             @Param("celularId") String celularId);
 
     /**
@@ -135,8 +135,8 @@ public interface ConfiguracaoMaquinaRepository extends JpaRepository<Configuraca
            "(:celularId IS NULL OR c.celularId = :celularId) AND " +
            "c.dtDelete IS NULL")
     Page<ConfiguracaoMaquinaModel> findByFiltersAndDtDeleteIsNull(
-            @Param("maquinaId") Long maquinaId,
-            @Param("matrizId") Long matrizId,
+            @Param("maquinaId") Integer maquinaId,
+            @Param("matrizId") Integer matrizId,
             @Param("celularId") String celularId,
             Pageable pageable);
 
@@ -150,6 +150,6 @@ public interface ConfiguracaoMaquinaRepository extends JpaRepository<Configuraca
            "c.dtDelete IS NULL " +
            "ORDER BY c.dtCreate DESC")
     Optional<ConfiguracaoMaquinaModel> findPreviousActiveBymaquinaIdExcludingId(
-            @Param("maquinaId") Long maquinaId,
-            @Param("excludeId") Long excludeId);
+            @Param("maquinaId") Integer maquinaId,
+            @Param("excludeId") Integer excludeId);
 }

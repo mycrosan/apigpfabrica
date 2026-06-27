@@ -5,12 +5,11 @@ import lombok.Data;
 @Data
 
 public class ProducaoFilterDTO {
-    private Long modeloId;
-    private Long marcaId;
-    private Long medidaId;
-    private Long paisId;
+    private Integer modeloId;
+    private Integer marcaId;
+    private Integer medidaId;
+    private Integer paisId;
     private String numeroEtiqueta;
 
     // Getters e Setters
 }
-

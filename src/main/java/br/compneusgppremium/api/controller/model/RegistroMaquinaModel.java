@@ -18,7 +18,7 @@ public class RegistroMaquinaModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "ID único do registro da máquina", example = "1")
-    private Long id;
+    private Integer id;
 
     @Column(name = "nome", nullable = false, length = 100)
     @Schema(description = "Nome da máquina", example = "Máquina de Produção 01", required = true)

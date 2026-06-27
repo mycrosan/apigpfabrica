@@ -74,9 +74,9 @@ CREATE TABLE IF NOT EXISTS motorista (
 -- Campos: tabela_afetada, registro_id, ação (INSERT, UPDATE, INATIVAR), usuário responsável, data da ação
 
 CREATE TABLE IF NOT EXISTS auditoria (
-  id BIGINT NOT NULL AUTO_INCREMENT,
+  id INT NOT NULL AUTO_INCREMENT,
   tabela_afetada VARCHAR(100) NOT NULL,
-  registro_id BIGINT NOT NULL,
+  registro_id INT NOT NULL,
   acao ENUM('INSERT','UPDATE','INATIVAR') NOT NULL,
   usuario_id INT NOT NULL,
   data_acao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -85,4 +85,3 @@ CREATE TABLE IF NOT EXISTS auditoria (
   INDEX idx_auditoria_usuario (usuario_id),
   CONSTRAINT fk_auditoria_usuario FOREIGN KEY (usuario_id) REFERENCES usuario (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-

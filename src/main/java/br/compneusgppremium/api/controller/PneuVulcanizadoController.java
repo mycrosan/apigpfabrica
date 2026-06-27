@@ -98,7 +98,7 @@ public class PneuVulcanizadoController {
             @ApiResponse(responseCode = "404", description = "Pneu vulcanizado não encontrado",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
-    public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<?> buscarPorId(@PathVariable Integer id) {
         try {
             PneuVulcanizadoResponseDTO response = pneuVulcanizadoService.buscarPorId(id);
             return ResponseEntity.ok(response);
@@ -122,7 +122,7 @@ public class PneuVulcanizadoController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
     public ResponseEntity<?> atualizarPneuVulcanizado(
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @Valid @RequestBody PneuVulcanizadoUpdateDTO dto) {
         try {
             PneuVulcanizadoResponseDTO response = pneuVulcanizadoService.atualizar(id, dto);
@@ -149,7 +149,7 @@ public class PneuVulcanizadoController {
             @ApiResponse(responseCode = "400", description = "Pneu vulcanizado já finalizado",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
-    public ResponseEntity<?> finalizarPneuVulcanizado(@PathVariable Long id) {
+    public ResponseEntity<?> finalizarPneuVulcanizado(@PathVariable Integer id) {
         try {
             PneuVulcanizadoResponseDTO response = pneuVulcanizadoService.finalizar(id);
             return ResponseEntity.ok(response);
@@ -204,7 +204,7 @@ public class PneuVulcanizadoController {
             @ApiResponse(responseCode = "404", description = "Pneu vulcanizado não encontrado",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
-    public ResponseEntity<?> deletarPneuVulcanizado(@PathVariable Long id) {
+    public ResponseEntity<?> deletarPneuVulcanizado(@PathVariable Integer id) {
         try {
             pneuVulcanizadoService.deletar(id);
             return ResponseEntity.noContent().build();

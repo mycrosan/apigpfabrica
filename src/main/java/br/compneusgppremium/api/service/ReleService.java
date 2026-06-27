@@ -75,7 +75,7 @@ public class ReleService {
     }
 
     @Transactional
-    public ReleResponseDTO atualizar(Long id, ReleCreateDTO dto) {
+    public ReleResponseDTO atualizar(Integer id, ReleCreateDTO dto) {
         // Buscar dispositivo existente
         SonoffModel model = sonoffRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Dispositivo com ID " + id + " não encontrado"));
@@ -110,7 +110,7 @@ public class ReleService {
     }
 
     @Transactional
-    public void excluir(Long id) {
+    public void excluir(Integer id) {
         Optional<SonoffModel> opt = sonoffRepository.findById(id);
         if (!opt.isPresent()) {
             throw new IllegalArgumentException("Dispositivo com ID " + id + " não encontrado");
@@ -119,7 +119,7 @@ public class ReleService {
     }
 
     private ReleResponseDTO toResponseDTO(SonoffModel model) {
-        Long maquinaId = null;
+        Integer maquinaId = null;
         String maquinaNome = null;
         if (model.getMaquina() != null) {
             maquinaId = model.getMaquina().getId();

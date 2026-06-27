@@ -86,7 +86,7 @@ public class RegistroMaquinaController {
     })
     @GetMapping(path = "/{id}", produces = "application/json; charset=UTF-8")
     public ResponseEntity<RegistroMaquinaResponseDTO> buscarPorId(
-            @Parameter(description = "ID da máquina") @PathVariable Long id) {
+            @Parameter(description = "ID da máquina") @PathVariable Integer id) {
         try {
             Optional<RegistroMaquinaModel> maquina = registroMaquinaRepository.findByIdAndDtDeleteIsNull(id);
             if (maquina.isPresent()) {
@@ -182,7 +182,7 @@ public class RegistroMaquinaController {
     @PutMapping(path = "/{id}", produces = "application/json; charset=UTF-8")
     @Transactional
     public ResponseEntity<?> atualizarMaquina(
-            @Parameter(description = "ID da máquina") @PathVariable Long id,
+            @Parameter(description = "ID da máquina") @PathVariable Integer id,
             @Valid @RequestBody RegistroMaquinaUpdateDTO dto) {
         try {
             Optional<RegistroMaquinaModel> maquinaOpt = registroMaquinaRepository.findByIdAndDtDeleteIsNull(id);
@@ -245,7 +245,7 @@ public class RegistroMaquinaController {
     @DeleteMapping(path = "/{id}", produces = "application/json; charset=UTF-8")
     @Transactional
     public ResponseEntity<?> deletarMaquina(
-            @Parameter(description = "ID da máquina") @PathVariable Long id) {
+            @Parameter(description = "ID da máquina") @PathVariable Integer id) {
         try {
             Optional<RegistroMaquinaModel> maquinaOpt = registroMaquinaRepository.findByIdAndDtDeleteIsNull(id);
             if (!maquinaOpt.isPresent()) {
@@ -294,7 +294,7 @@ public class RegistroMaquinaController {
     @PutMapping(path = "/{id}/status", produces = "application/json; charset=UTF-8")
     @Transactional
     public ResponseEntity<?> alterarStatus(
-            @Parameter(description = "ID da máquina") @PathVariable Long id,
+            @Parameter(description = "ID da máquina") @PathVariable Integer id,
             @Parameter(description = "Novo status da máquina") @RequestParam StatusMaquina status) {
         try {
             Optional<RegistroMaquinaModel> maquinaOpt = registroMaquinaRepository.findByIdAndDtDeleteIsNull(id);
@@ -323,7 +323,7 @@ public class RegistroMaquinaController {
     @PutMapping(path = "/{id}/manutencao", produces = "application/json; charset=UTF-8")
     @Transactional
     public ResponseEntity<?> colocarEmManutencao(
-            @Parameter(description = "ID da máquina") @PathVariable Long id) {
+            @Parameter(description = "ID da máquina") @PathVariable Integer id) {
         try {
             Optional<RegistroMaquinaModel> maquinaOpt = registroMaquinaRepository.findByIdAndDtDeleteIsNull(id);
             if (!maquinaOpt.isPresent()) {
@@ -351,7 +351,7 @@ public class RegistroMaquinaController {
     @PutMapping(path = "/{id}/ativar", produces = "application/json; charset=UTF-8")
     @Transactional
     public ResponseEntity<?> ativarMaquina(
-            @Parameter(description = "ID da máquina") @PathVariable Long id) {
+            @Parameter(description = "ID da máquina") @PathVariable Integer id) {
         try {
             Optional<RegistroMaquinaModel> maquinaOpt = registroMaquinaRepository.findByIdAndDtDeleteIsNull(id);
             if (!maquinaOpt.isPresent()) {
@@ -379,7 +379,7 @@ public class RegistroMaquinaController {
     @PutMapping(path = "/{id}/inativar", produces = "application/json; charset=UTF-8")
     @Transactional
     public ResponseEntity<?> inativarMaquina(
-            @Parameter(description = "ID da máquina") @PathVariable Long id) {
+            @Parameter(description = "ID da máquina") @PathVariable Integer id) {
         try {
             Optional<RegistroMaquinaModel> maquinaOpt = registroMaquinaRepository.findByIdAndDtDeleteIsNull(id);
             if (!maquinaOpt.isPresent()) {

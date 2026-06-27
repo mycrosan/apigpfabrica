@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RepositoryRestResource(collectionResourceRel = "pneus-vulcanizados", path = "pneus-vulcanizados")
-public interface PneuVulcanizadoRepository extends CrudRepository<PneuVulcanizadoModel, Long> {
+public interface PneuVulcanizadoRepository extends CrudRepository<PneuVulcanizadoModel, Integer> {
 
     /**
      * Busca pneus vulcanizados por usuário

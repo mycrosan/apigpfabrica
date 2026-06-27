@@ -131,7 +131,7 @@ public class ConfiguracaoMaquinaController {
             @Parameter(description = "Tamanho da página", example = "10")
             @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "ID da máquina para filtrar")
-            @RequestParam(required = false) Long maquinaId) {
+            @RequestParam(required = false) Integer maquinaId) {
 
         try {
             Pageable pageable = PageRequest.of(page, size);
@@ -268,7 +268,7 @@ public class ConfiguracaoMaquinaController {
             @ApiResponse(responseCode = "404", description = "Configuração não encontrada",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
-    public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<?> buscarPorId(@PathVariable Integer id) {
         try {
             Optional<ConfiguracaoMaquinaModel> configuracaoOpt = configuracaoMaquinaRepository.findByIdAndDtDeleteIsNull(id);
             if (!configuracaoOpt.isPresent()) {
@@ -300,7 +300,7 @@ public class ConfiguracaoMaquinaController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
     public ResponseEntity<?> atualizarConfiguracao(
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @Valid @RequestBody ConfiguracaoMaquinaUpdateDTO dto) {
 
         try {
@@ -348,7 +348,7 @@ public class ConfiguracaoMaquinaController {
             @ApiResponse(responseCode = "404", description = "Configuração não encontrada",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
-    public ResponseEntity<?> deletarConfiguracao(@PathVariable Long id) {
+    public ResponseEntity<?> deletarConfiguracao(@PathVariable Integer id) {
         try {
             Optional<ConfiguracaoMaquinaModel> configuracaoOpt = configuracaoMaquinaRepository.findByIdAndDtDeleteIsNull(id);
             if (!configuracaoOpt.isPresent()) {
@@ -357,7 +357,7 @@ public class ConfiguracaoMaquinaController {
             }
 
             ConfiguracaoMaquinaModel configuracao = configuracaoOpt.get();
-            Long maquinaId = configuracao.getMaquina().getId();
+            Integer maquinaId = configuracao.getMaquina().getId();
             
             // Realiza o soft delete da configuração atual
             configuracao.softDelete();

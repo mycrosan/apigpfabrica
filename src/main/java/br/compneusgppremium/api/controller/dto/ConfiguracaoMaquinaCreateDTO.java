@@ -14,7 +14,7 @@ public class ConfiguracaoMaquinaCreateDTO {
 
     @NotNull(message = "ID da máquina é obrigatório")
     @Schema(description = "ID da máquina", example = "1", required = true)
-    private Long maquinaId;
+    private Integer maquinaId;
 
     @NotNull(message = "ID da matriz é obrigatório")
     @Schema(description = "ID da matriz", example = "1", required = true)
@@ -34,7 +34,7 @@ public class ConfiguracaoMaquinaCreateDTO {
     // Construtores
     public ConfiguracaoMaquinaCreateDTO() {}
 
-    public ConfiguracaoMaquinaCreateDTO(Long maquinaId, Integer matrizId, String celularId, 
+    public ConfiguracaoMaquinaCreateDTO(Integer maquinaId, Integer matrizId, String celularId,
                                        String descricao, String atributos) {
         this.maquinaId = maquinaId;
         this.matrizId = matrizId;
@@ -44,11 +44,11 @@ public class ConfiguracaoMaquinaCreateDTO {
     }
 
     // Getters e Setters
-    public Long getMaquinaId() {
+    public Integer getMaquinaId() {
         return maquinaId;
     }
 
-    public void setMaquinaId(Long maquinaId) {
+    public void setMaquinaId(Integer maquinaId) {
         this.maquinaId = maquinaId;
     }
 

@@ -19,7 +19,7 @@ public class SonoffModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "ID único do dispositivo", example = "1")
-    private Long id;
+    private Integer id;
 
     // Removido campo 'nome' conforme novo requisito
 

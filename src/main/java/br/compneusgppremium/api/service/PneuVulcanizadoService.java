@@ -72,7 +72,7 @@ public class PneuVulcanizadoService {
     /**
      * Atualiza o status de um pneu vulcanizado
      */
-    public PneuVulcanizadoResponseDTO atualizar(Long id, PneuVulcanizadoUpdateDTO updateDTO) {
+    public PneuVulcanizadoResponseDTO atualizar(Integer id, PneuVulcanizadoUpdateDTO updateDTO) {
         PneuVulcanizadoModel pneuVulcanizado = pneuVulcanizadoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pneu vulcanizado não encontrado com ID: " + id));
 
@@ -88,7 +88,7 @@ public class PneuVulcanizadoService {
     /**
      * Finaliza um pneu vulcanizado (atualiza status para FINALIZADO)
      */
-    public PneuVulcanizadoResponseDTO finalizar(Long id) {
+    public PneuVulcanizadoResponseDTO finalizar(Integer id) {
         PneuVulcanizadoUpdateDTO updateDTO = new PneuVulcanizadoUpdateDTO(StatusVulcanizacao.FINALIZADO);
         return atualizar(id, updateDTO);
     }
@@ -97,7 +97,7 @@ public class PneuVulcanizadoService {
      * Busca pneu vulcanizado por ID
      */
     @Transactional(readOnly = true)
-    public PneuVulcanizadoResponseDTO buscarPorId(Long id) {
+    public PneuVulcanizadoResponseDTO buscarPorId(Integer id) {
         PneuVulcanizadoModel pneuVulcanizado = pneuVulcanizadoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pneu vulcanizado não encontrado com ID: " + id));
 
@@ -165,7 +165,7 @@ public class PneuVulcanizadoService {
     /**
      * Exclui logicamente um pneu vulcanizado
      */
-    public void excluir(Long id) {
+    public void excluir(Integer id) {
         PneuVulcanizadoModel pneuVulcanizado = pneuVulcanizadoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pneu vulcanizado não encontrado com ID: " + id));
 
@@ -180,7 +180,7 @@ public class PneuVulcanizadoService {
     /**
      * Deleta logicamente um pneu vulcanizado (alias para excluir)
      */
-    public void deletar(Long id) {
+    public void deletar(Integer id) {
         excluir(id);
     }
 
