@@ -10,12 +10,13 @@
     </parent>
     <groupId>br.compneusgppremium</groupId>
     <artifactId>gp-premium</artifactId>
-    <version>1.11.0</version>
+    <version>1.12.0</version>
     <packaging>war</packaging>
     <name>GP Premium</name>
     <description>Api GP</description>
     <properties>
         <java.version>11</java.version>
+        <lombok.version>1.18.20</lombok.version>
     </properties>
     <dependencies>
 
@@ -27,8 +28,14 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.20</version>
+            <version>${lombok.version}</version>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -94,6 +101,10 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.tomcat.embed</groupId>
+                    <artifactId>tomcat-embed-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.tomcat.embed</groupId>
                     <artifactId>tomcat-embed-websocket</artifactId>
                 </exclusion>
             </exclusions>
@@ -153,6 +164,19 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <packagingExcludes>
+                        WEB-INF/lib/spring-boot-starter-tomcat-*.jar,
+                        WEB-INF/lib/tomcat-embed-core-*.jar,
+                        WEB-INF/lib/tomcat-embed-websocket-*.jar
+                    </packagingExcludes>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -244,6 +268,13 @@
                     <source>11</source>
                     <target>11</target>
                     <encoding>UTF-8</encoding>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
 
@@ -255,13 +286,10 @@
         <!-- Desenvolvimento: executa com Tomcat embutido e perfil 'dev' -->
         <profile>
             <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
@@ -287,17 +315,6 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-tomcat</artifactId>
                     <scope>provided</scope>
-                </dependency>
-                <!-- Starter web sem Tomcat embutido para evitar conflitos no WildFly -->
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-starter-tomcat</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
             </dependencies>
             <build>

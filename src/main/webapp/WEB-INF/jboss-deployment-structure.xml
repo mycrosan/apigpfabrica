@@ -1,27 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jboss-deployment-structure>
-    <deployment>
-        <!-- Desativa todos os subsistemas de WebSocket -->
-        <exclude-subsystems>
-            <subsystem name="webservices" />
-            <subsystem name="websockets" />
-        </exclude-subsystems>
-        
-        <!-- Exclui módulos de WebSocket do Tomcat -->
-        <exclusions>
-            <module name="javax.websocket.api" />
-            <module name="org.apache.tomcat.embed" />
-            <module name="org.apache.tomcat.embed.websocket" />
-            <module name="org.apache.tomcat.websocket" />
-            <module name="org.apache.tomcat.websocket-api" />
-        </exclusions>
-        
-        <!-- Força o uso dos módulos do WildFly/Undertow -->
-        <dependencies>
-            <module name="javax.enterprise.api" export="true" />
-            <module name="javax.servlet.api" export="true" />
-            <module name="javax.websocket.api" export="false" />
-            <module name="org.wildfly.extension.undertow" export="true" />
-        </dependencies>
-    </deployment>
+    <deployment />
 </jboss-deployment-structure>
