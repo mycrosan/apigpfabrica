@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
@@ -120,6 +121,7 @@ public class QualidadeController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos"),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
+    @Transactional
     @PostMapping(path = "/api/qualidade")
     public Object salvar(@RequestBody QualidadeModel qualidade) {
 
@@ -155,23 +157,22 @@ public class QualidadeController {
                         QualidadeModel qualidadeSalva = qualidadeRepository.save(qualidade);
 
                         // Se aprovado na qualidade (tipo_classificacao id == 1), validar a regra
-                        try {
-                            RegraModel regra = producao.get().getRegra();
-                            if (regra != null && qualidade.getTipo_observacao() != null && qualidade.getTipo_observacao().getTipo_classificacao() != null
-                                    && qualidade.getTipo_observacao().getTipo_classificacao().getId() == 1) {
-                                regra.setStatus(RegraStatus.VALIDADA);
-                                regraRepository.save(regra);
+                        RegraModel regraAssociada = producao.get().getRegra();
+                        if (regraAssociada != null && regraAssociada.getId() != null
+                                && qualidade.getTipo_observacao() != null
+                                && qualidade.getTipo_observacao().getTipo_classificacao() != null
+                                && qualidade.getTipo_observacao().getTipo_classificacao().getId() == 1) {
+                            RegraModel regra = regraRepository.findById(regraAssociada.getId())
+                                    .orElseThrow(() -> new RuntimeException("Regra não encontrada ao validar qualidade: id=" + regraAssociada.getId()));
+                            regra.setStatus(RegraStatus.VALIDADA);
+                            regraRepository.save(regra);
 
-                                ValidaRegraModel valida = new ValidaRegraModel();
-                                valida.setQualidade(qualidadeSalva);
-                                valida.setRegra(regra);
-                                valida.setStatus(Boolean.TRUE);
-                                valida.setDados("{\"aprovado\":true,\"qualidadeId\":" + qualidadeSalva.getId() + ",\"regraId\":" + regra.getId() + "}");
-                                validaRegraRepository.save(valida);
-                            }
-                        } catch (Exception e) {
-                            // Em caso de falha ao validar regra, continuar fluxo de qualidade mas retornar informação do erro
-                            e.printStackTrace();
+                            ValidaRegraModel valida = new ValidaRegraModel();
+                            valida.setQualidade(qualidadeSalva);
+                            valida.setRegra(regra);
+                            valida.setStatus(Boolean.TRUE);
+                            valida.setDados("{\"aprovado\":true,\"qualidadeId\":" + qualidadeSalva.getId() + ",\"regraId\":" + regra.getId() + "}");
+                            validaRegraRepository.save(valida);
                         }
 
                         return qualidadeSalva;
