@@ -10,7 +10,7 @@
     </parent>
     <groupId>br.compneusgppremium</groupId>
     <artifactId>gp-premium</artifactId>
-    <version>1.11.0</version>
+    <version>1.13.0</version>
     <packaging>war</packaging>
     <name>GP Premium</name>
     <description>Api GP</description>
