@@ -3,6 +3,7 @@ package br.compneusgppremium.api.controller;
 import br.compneusgppremium.api.controller.dto.ProducaoDTO;
 import br.compneusgppremium.api.controller.model.*;
 import br.compneusgppremium.api.repository.CarcacaRepository;
+import br.compneusgppremium.api.repository.QualidadeRepository;
 import br.compneusgppremium.api.repository.ProducaoRepository;
 import br.compneusgppremium.api.repository.RegraRepository;
 import br.compneusgppremium.api.repository.UsuarioRepository;
@@ -27,8 +28,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.*;
 
-import static org.apache.logging.log4j.util.Strings.isNotBlank;
-
 @RestController
 @Tag(name = "Produção", description = "Operações relacionadas ao controle de produção")
 @SecurityRequirement(name = "Bearer Authentication")
@@ -48,6 +47,9 @@ public class ProducaoController {
 
     @Autowired
     private RegraRepository regraRepository;
+
+    @Autowired
+    private QualidadeRepository qualidadeRepository;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -173,12 +175,13 @@ public class ProducaoController {
         var statusCarcaca = new StatusCarcacaModel();
         statusCarcaca.setId(2);
 
-        var sql = "SELECT p FROM producao p where p.carcaca.id=" + producao.getCarcaca().getId();
-
         try {
-            Query consulta = entityManager.createQuery(sql);
-            List values = consulta.getResultList();
-            if (!values.isEmpty()) {
+            Integer carcacaId = Optional.ofNullable(producao.getCarcaca())
+                    .map(CarcacaModel::getId)
+                    .orElseThrow(() -> new RuntimeException("Carcaça não informada"));
+
+            List<ProducaoModel> producoesDaCarcaca = buscarProducoesDaCarcaca(carcacaId);
+            if (!producoesDaCarcaca.isEmpty()) {
                 throw new RuntimeException("Já produzido!");
             }
 
@@ -194,33 +197,30 @@ public class ProducaoController {
                     regraDb = regraRepository.save(regraDb);
                 }
 
-                long producoesComRegra = producaoRepository.countByRegraId(regraDb.getId());
-                if (regraDb.getStatus() == RegraStatus.EM_VALIDACAO && producoesComRegra >= 1) {
-                    // Buscar a primeira produção da regra que precisa ser qualificada
-                    List<ProducaoModel> producoesDaRegra = producaoRepository.findFirstByRegraIdOrderByDtCreateAsc(regraDb.getId());
-                    String numeroEtiqueta = "etiqueta não encontrada";
-                    
-                    if (!producoesDaRegra.isEmpty()) {
-                        ProducaoModel primeiraProducao = producoesDaRegra.get(0);
-                        numeroEtiqueta = carcacaRepository.findById(primeiraProducao.getCarcaca().getId())
-                                .map(carcaca -> carcaca.getNumero_etiqueta())
+                if (regraDb.getStatus() == RegraStatus.EM_VALIDACAO) {
+                    Optional<ProducaoModel> producaoPendente = buscarProducaoDaRegraPendenteDeQualidade(regraDb.getId());
+                    if (producaoPendente.isPresent()) {
+                        String numeroEtiqueta = Optional.ofNullable(producaoPendente.get().getCarcaca())
+                                .map(CarcacaModel::getId)
+                                .flatMap(carcacaRepository::findById)
+                                .map(CarcacaModel::getNumero_etiqueta)
                                 .orElse("etiqueta não encontrada");
+
+                        ApiError apiError = new ApiError(
+                                HttpStatus.PRECONDITION_REQUIRED,
+                                "Regra em validação: crie a primeira produção e aguarde aprovação na qualidade para liberar novas produções. Etiqueta que precisa ser qualificada: " + numeroEtiqueta,
+                                null,
+                                "Regra EM_VALIDACAO já possui uma produção pendente de qualidade"
+                        );
+                        return apiError;
                     }
-                    
-                    ApiError apiError = new ApiError(
-                            HttpStatus.PRECONDITION_REQUIRED,
-                            "Regra em validação: crie a primeira produção e aguarde aprovação na qualidade para liberar novas produções. Etiqueta que precisa ser qualificada: " + numeroEtiqueta,
-                            null,
-                            "Regra EM_VALIDACAO já possui uma produção"
-                    );
-                    return apiError;
                 }
 
                 // Vincular a regra carregada do banco para não confiar no payload recebido
                 producao.setRegra(regraDb);
             }
 
-            return carcacaRepository.findById(producao.getCarcaca().getId())
+            return carcacaRepository.findById(carcacaId)
                     .map(record -> {
                         record.setStatus("in_production");
                         record.setStatus_carcaca(statusCarcaca);
@@ -246,6 +246,23 @@ public class ProducaoController {
                     ex.getCause() != null ? ex.getCause().toString() : "Erro");
             return apiError;
         }
+    }
+
+    private List<ProducaoModel> buscarProducoesDaCarcaca(Integer carcacaId) {
+        String sql = "SELECT p FROM producao p where p.carcaca.id=" + carcacaId + " ORDER BY p.dt_create DESC";
+        var consulta = entityManager.createQuery(sql, ProducaoModel.class);
+        consulta.setMaxResults(1);
+        return consulta.getResultList();
+    }
+
+    private Optional<ProducaoModel> buscarProducaoDaRegraPendenteDeQualidade(Integer regraId) {
+        List<ProducaoModel> producoesDaRegra = producaoRepository.findFirstByRegraIdOrderByDtCreateAsc(regraId);
+        for (ProducaoModel producao : producoesDaRegra) {
+            if (qualidadeRepository.findByProducaoId(producao.getId()).isEmpty()) {
+                return Optional.of(producao);
+            }
+        }
+        return Optional.empty();
     }
 
     @PutMapping(path = "/api/producao/{id}")
