@@ -1,10 +1,16 @@
 package br.compneusgppremium.api.controller;
 
+import br.compneusgppremium.api.controller.dto.ClassificacaoCombinacaoDTO;
+import br.compneusgppremium.api.controller.dto.LeituraLateralDTO;
+import br.compneusgppremium.api.controller.form.LeituraLateralForm;
 import br.compneusgppremium.api.controller.model.CarcacaModel;
+import br.compneusgppremium.api.controller.model.MedidaModel;
 import br.compneusgppremium.api.controller.model.StatusCarcacaModel;
 import br.compneusgppremium.api.controller.model.UsuarioModel;
 import br.compneusgppremium.api.repository.CarcacaRepository;
 import br.compneusgppremium.api.repository.UsuarioRepository;
+import br.compneusgppremium.api.service.CombinacaoPneuService;
+import br.compneusgppremium.api.service.LeituraCarcacaService;
 import br.compneusgppremium.api.util.ApiError;
 import br.compneusgppremium.api.util.OperationSystem;
 import br.compneusgppremium.api.util.UsuarioLogadoUtil;
@@ -48,6 +54,12 @@ public class CarcacaController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private LeituraCarcacaService leituraCarcacaService;
+
+    @Autowired
+    private CombinacaoPneuService combinacaoPneuService;
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -87,7 +99,18 @@ public class CarcacaController {
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PutMapping(produces = "application/json; charset=UTF-8", path = "/api/carcaca/{id}")
-    public Object atualizar(@Parameter(description = "ID da carcaça") @PathVariable("id") Integer id, @RequestBody CarcacaModel carcaca) {
+    public Object atualizar(@Parameter(description = "ID da carcaça") @PathVariable("id") Integer id,
+            @RequestBody CarcacaModel carcaca,
+            @Parameter(description = "Confirma explicitamente uma combinação modelo+medida+país nunca vista")
+            @RequestParam(name = "confirmarCombinacaoNova", required = false, defaultValue = "false") Boolean confirmarCombinacaoNova) {
+
+        ClassificacaoCombinacaoDTO classificacao = combinacaoPneuService.classificar(
+                carcaca.getModelo() != null ? carcaca.getModelo().getId() : null,
+                carcaca.getMedida() != null ? carcaca.getMedida().getId() : null,
+                carcaca.getPais() != null ? carcaca.getPais().getId() : null);
+        if ("VERMELHO".equals(classificacao.getClassificacao()) && !Boolean.TRUE.equals(confirmarCombinacaoNova)) {
+            return new ApiError(HttpStatus.OK, classificacao.getMensagem(), "COMBINACAO_NAO_RECONHECIDA");
+        }
 
         var sql = "SELECT cr FROM carcaca_rejeitada cr where cr.modelo.id=" + carcaca.getModelo().getId() +
                 " and cr.medida.id=" + carcaca.getMedida().getId() +
@@ -124,9 +147,19 @@ public class CarcacaController {
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     @PostMapping(produces = "application/json; charset=UTF-8", path = "/api/carcaca")
-    public Object salvar(@RequestBody CarcacaModel carcaca) {
+    public Object salvar(@RequestBody CarcacaModel carcaca,
+            @Parameter(description = "Confirma explicitamente uma combinação modelo+medida+país nunca vista")
+            @RequestParam(name = "confirmarCombinacaoNova", required = false, defaultValue = "false") Boolean confirmarCombinacaoNova) {
         var statusCarcaca = new StatusCarcacaModel();
         statusCarcaca.setId(1);
+
+        ClassificacaoCombinacaoDTO classificacao = combinacaoPneuService.classificar(
+                carcaca.getModelo() != null ? carcaca.getModelo().getId() : null,
+                carcaca.getMedida() != null ? carcaca.getMedida().getId() : null,
+                carcaca.getPais() != null ? carcaca.getPais().getId() : null);
+        if ("VERMELHO".equals(classificacao.getClassificacao()) && !Boolean.TRUE.equals(confirmarCombinacaoNova)) {
+            return new ApiError(HttpStatus.OK, classificacao.getMensagem(), "COMBINACAO_NAO_RECONHECIDA");
+        }
 
         var sql = "SELECT cr FROM carcaca_rejeitada cr where cr.modelo.id=" + carcaca.getModelo().getId() +
                 " and cr.medida.id=" + carcaca.getMedida().getId() +
@@ -167,6 +200,53 @@ public class CarcacaController {
             return e;
         }
 
+    }
+
+    @Operation(summary = "Reconhecimento automático do pneu pela foto da lateral",
+            description = "Recebe a foto da lateral do pneu em base64 e usa IA para reconhecer qual pneu (marca+modelo+medida) "
+                    + "é aquele, comparando com os catálogos — não é uma leitura de texto campo a campo. Retorna de 1 a 4 "
+                    + "candidatos ranqueados (1 só quando a IA tem certeza), além de DOT e país lidos à parte. "
+                    + "O cadastro continua manual: o operador confere/escolhe e confirma.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Leitura realizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Foto ausente ou inválida"),
+            @ApiResponse(responseCode = "500", description = "Falha na leitura por IA")
+    })
+    @PostMapping(produces = "application/json; charset=UTF-8", path = "/api/carcaca/leitura-lateral")
+    public Object leituraLateral(@RequestBody LeituraLateralForm form) {
+        try {
+            LeituraLateralDTO resultado = leituraCarcacaService.lerLateral(form.getFoto_base64());
+            return ResponseEntity.ok().body(resultado);
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            return new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex,
+                    ex.getCause() != null ? ex.getCause().toString() : "Erro");
+        } catch (Exception ex) {
+            System.out.println(ex);
+            return new ApiError(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Não foi possível ler a lateral do pneu", ex,
+                    ex.getCause() != null ? ex.getCause().toString() : "Erro");
+        }
+    }
+
+    @Operation(summary = "Classificar combinação modelo+medida+país",
+            description = "Verifica se a fábrica já sabe produzir esse pneu antes de salvar a carcaça: "
+                    + "VERDE (tem regra de produção), AMARELO (já cadastrado antes mas sem regra) ou "
+                    + "VERMELHO (combinação nunca vista — precisa de confirmação explícita pra salvar).")
+    @GetMapping(path = "/api/carcaca/classificar-combinacao")
+    public ClassificacaoCombinacaoDTO classificarCombinacao(
+            @Parameter(description = "ID do modelo") @RequestParam("modeloId") Integer modeloId,
+            @Parameter(description = "ID da medida") @RequestParam("medidaId") Integer medidaId,
+            @Parameter(description = "ID do país") @RequestParam("paisId") Integer paisId) {
+        return combinacaoPneuService.classificar(modeloId, medidaId, paisId);
+    }
+
+    @Operation(summary = "Medidas plausíveis para um modelo",
+            description = "Lista as medidas que já têm regra de produção ou histórico de cadastro pra esse "
+                    + "modelo — usado pra filtrar o dropdown de medida no cadastro (cascata modelo→medida).")
+    @GetMapping(path = "/api/carcaca/medidas-plausiveis")
+    public List<MedidaModel> medidasPlausiveis(
+            @Parameter(description = "ID do modelo") @RequestParam("modeloId") Integer modeloId) {
+        return combinacaoPneuService.medidasPlausiveis(modeloId);
     }
 
     @Operation(summary = "Excluir carcaça", description = "Exclui uma carcaça pelo ID")

@@ -25,4 +25,14 @@ public interface RegraRepository extends CrudRepository<RegraModel, Integer> {
             "and (r.pais.id = :paisId)")
     public List<Object> findByRange(@Param("matrizId") Integer matrizId, @Param("medidaId") Integer medidaId, @Param("modeloId") Integer modeloId, @Param("paisId") Integer paisId,@Param("tamanhoMin") Double tamanhoMin, @Param("tamanhoMax") Double tamanhoMax);
 
+    // Usado pela validação de combinação no cadastro de carcaça: existe regra de
+    // produção pra esse trio? (independente de matriz/tamanho do pneu raspado)
+    @Query("select count(r) > 0 from regra r where r.modelo.id = :modeloId and r.medida.id = :medidaId and r.pais.id = :paisId")
+    public boolean existeParaTrio(@Param("modeloId") Integer modeloId, @Param("medidaId") Integer medidaId, @Param("paisId") Integer paisId);
+
+    // Medidas que já têm regra de produção pra esse modelo — usado pra filtrar o
+    // dropdown de medida na cascata do cadastro.
+    @Query("select distinct r.medida.id from regra r where r.modelo.id = :modeloId")
+    public List<Integer> findMedidaIdsPorModelo(@Param("modeloId") Integer modeloId);
+
 }

@@ -48,3 +48,5 @@ Dump*.sql
 *.sql
 !src/main/resources/db/migration/*.sql
 .xdg_state/
+.env
+.env.local
