@@ -109,7 +109,11 @@ public class CarcacaController {
                 carcaca.getMedida() != null ? carcaca.getMedida().getId() : null,
                 carcaca.getPais() != null ? carcaca.getPais().getId() : null);
         if ("VERMELHO".equals(classificacao.getClassificacao()) && !Boolean.TRUE.equals(confirmarCombinacaoNova)) {
-            return new ApiError(HttpStatus.OK, classificacao.getMensagem(), "COMBINACAO_NAO_RECONHECIDA");
+            ApiError erroCombinacao = new ApiError(HttpStatus.OK, classificacao.getMensagem(), "COMBINACAO_NAO_RECONHECIDA");
+            // editdatawidget.dart exibe value.debugMessage sem tratar null — preenche
+            // igual ao message pra não quebrar a tela de edição nesse bloqueio.
+            erroCombinacao.setDebugMessage(classificacao.getMensagem());
+            return erroCombinacao;
         }
 
         var sql = "SELECT cr FROM carcaca_rejeitada cr where cr.modelo.id=" + carcaca.getModelo().getId() +
@@ -158,7 +162,11 @@ public class CarcacaController {
                 carcaca.getMedida() != null ? carcaca.getMedida().getId() : null,
                 carcaca.getPais() != null ? carcaca.getPais().getId() : null);
         if ("VERMELHO".equals(classificacao.getClassificacao()) && !Boolean.TRUE.equals(confirmarCombinacaoNova)) {
-            return new ApiError(HttpStatus.OK, classificacao.getMensagem(), "COMBINACAO_NAO_RECONHECIDA");
+            ApiError erroCombinacao = new ApiError(HttpStatus.OK, classificacao.getMensagem(), "COMBINACAO_NAO_RECONHECIDA");
+            // editdatawidget.dart exibe value.debugMessage sem tratar null — preenche
+            // igual ao message pra não quebrar a tela de edição nesse bloqueio.
+            erroCombinacao.setDebugMessage(classificacao.getMensagem());
+            return erroCombinacao;
         }
 
         var sql = "SELECT cr FROM carcaca_rejeitada cr where cr.modelo.id=" + carcaca.getModelo().getId() +
