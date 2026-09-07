@@ -3,9 +3,9 @@ package br.compneusgppremium.api.service;
 import br.compneusgppremium.api.controller.dto.ProducaoFilterDTO;
 import br.compneusgppremium.api.controller.model.ProducaoModel;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

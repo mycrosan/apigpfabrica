@@ -3,7 +3,7 @@ package br.compneusgppremium.api.controller.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity(name = "medida")
 @Data

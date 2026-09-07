@@ -3,7 +3,7 @@ package br.compneusgppremium.api.controller.model;
 import br.compneusgppremium.api.util.JpaConverterJson;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Data
 @Entity(name = "valida_regra")

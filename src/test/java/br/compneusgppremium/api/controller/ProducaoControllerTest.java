@@ -22,8 +22,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import java.util.Date;
 import java.util.Collections;
 import java.util.List;
@@ -78,7 +78,6 @@ public class ProducaoControllerTest {
 
         // Mock consulta de duplicidade por carcaça: retornar vazio para passar na primeira verificação
         TypedQuery<ProducaoModel> queryMock = Mockito.mock(TypedQuery.class);
-        when(entityManager.createQuery(anyString())).thenReturn(queryMock);
         when(entityManager.createQuery(anyString(), Mockito.eq(ProducaoModel.class))).thenReturn(queryMock);
         when(queryMock.getResultList()).thenReturn(Collections.emptyList());
         when(queryMock.setMaxResults(anyInt())).thenReturn(queryMock);
@@ -116,27 +115,12 @@ public class ProducaoControllerTest {
         producao.setUuid(UUID.randomUUID());
 
         TypedQuery<ProducaoModel> queryMock = Mockito.mock(TypedQuery.class);
-        when(entityManager.createQuery(anyString())).thenReturn(queryMock);
         when(entityManager.createQuery(anyString(), Mockito.eq(ProducaoModel.class))).thenReturn(queryMock);
-        when(queryMock.setMaxResults(anyInt())).thenReturn(queryMock);
 
         ProducaoModel producaoExistente = new ProducaoModel();
         producaoExistente.setId(1);
         producaoExistente.setCarcaca(carcacaPayload);
         when(queryMock.getResultList()).thenReturn(List.of(producaoExistente));
-
-        CarcacaModel carcacaDb = new CarcacaModel();
-        carcacaDb.setId(10);
-        StatusCarcacaModel statusRejeitada = new StatusCarcacaModel();
-        statusRejeitada.setId(4);
-        carcacaDb.setStatus_carcaca(statusRejeitada);
-        when(carcacaRepository.findById(carcacaPayload.getId())).thenReturn(Optional.of(carcacaDb));
-        when(carcacaRepository.save(Mockito.any(CarcacaModel.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        when(usuarioLogadoUtil.getUsuarioIdLogado()).thenReturn(1);
-        when(usuarioRepository.findById(1)).thenReturn(Optional.of(new br.compneusgppremium.api.controller.model.UsuarioModel()));
-
-        when(producaoRepository.save(Mockito.any(ProducaoModel.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Object resultado = producaoController.salvar(producao);
 
@@ -159,7 +143,6 @@ public class ProducaoControllerTest {
         producao.setRegra(regra);
 
         TypedQuery<ProducaoModel> queryMock = Mockito.mock(TypedQuery.class);
-        when(entityManager.createQuery(anyString())).thenReturn(queryMock);
         when(entityManager.createQuery(anyString(), Mockito.eq(ProducaoModel.class))).thenReturn(queryMock);
         when(queryMock.setMaxResults(anyInt())).thenReturn(queryMock);
         when(queryMock.getResultList()).thenReturn(Collections.emptyList());

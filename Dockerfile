@@ -1,19 +1,16 @@
-# Use a imagem base do Maven
-FROM maven:3.8.4-openjdk-11-slim
+FROM maven:3.9.11-eclipse-temurin-17 AS build
+WORKDIR /build
+COPY pom.xml mvnw ./
+COPY .mvn .mvn
+RUN ./mvnw -B dependency:go-offline
+COPY checkstyle.xml ./
+COPY src src
+RUN ./mvnw -B package
 
-# Instala as dependências necessárias
-RUN apt-get update && apt-get install -y \
-    netcat \
-    && rm -rf /var/lib/apt/lists/*
-
-# Define o diretório de trabalho
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
-
-# Copia os arquivos do projeto
-COPY . .
-
-# Baixa as dependências do Maven (isso é armazenado em cache no Docker)
-RUN mvn dependency:go-offline -B
-
-# Define o comando padrão (será sobrescrito pelo docker-compose)
-CMD ["tail", "-f", "/dev/null"]
+RUN groupadd --gid 10001 gp && useradd --uid 10001 --gid gp --create-home gp
+COPY --from=build /build/target/*.war /app/application.war
+USER gp
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app/application.war"]

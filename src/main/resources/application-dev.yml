@@ -1,0 +1,6 @@
+server:
+  servlet:
+    context-path: /gp
+logging:
+  level:
+    org.springframework: INFO

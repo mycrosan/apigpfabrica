@@ -26,6 +26,7 @@ import java.util.Set;
  * `carcaca` (fonte observacional, com um mínimo de ocorrências pra não confiar
  * em erro antigo isolado).
  */
+@org.springframework.transaction.annotation.Transactional(readOnly = true)
 @Service
 public class CombinacaoPneuService {
 
@@ -83,5 +84,9 @@ public class CombinacaoPneuService {
         }
         medidas.sort((a, b) -> a.descricao.compareTo(b.descricao));
         return medidas;
+    }
+    public List<br.compneusgppremium.api.controller.dto.CatalogoPneuDTO> medidasCatalogo(final Integer modeloId) {
+        return medidasPlausiveis(modeloId).stream().map(medida ->
+                new br.compneusgppremium.api.controller.dto.CatalogoPneuDTO(medida.getId(), medida.getDescricao())).toList();
     }
 }

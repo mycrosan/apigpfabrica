@@ -4,7 +4,7 @@ import br.compneusgppremium.api.util.JpaConverterJson;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 

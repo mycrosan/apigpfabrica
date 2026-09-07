@@ -14,4 +14,8 @@ public interface CarcacaRejeitadaRepository extends CrudRepository<CarcacaRejeit
     @Query("from carcaca c where c.numero_etiqueta=:numeroEtiqueta")
     public List<Object> findByEtiquetaDuplicate(@Param("numeroEtiqueta") String numeroEtiqueta);
 
+    @Query("select count(c) > 0 from carcaca_rejeitada c where c.modelo.id = :modeloId "
+            + "and c.medida.id = :medidaId and c.pais.id = :paisId")
+    boolean existeTrio(@Param("modeloId") Integer modeloId, @Param("medidaId") Integer medidaId,
+            @Param("paisId") Integer paisId);
 }

@@ -12,11 +12,12 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -25,7 +26,7 @@ import org.springframework.web.client.RestTemplate;
 @EnableWebSecurity
 @Configuration
 @EnableAsync
-public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
+public class SecurityConfigurations {
 
     @Autowired
     private AutenticacaoService autenticacaoService;
@@ -36,42 +37,26 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    @Override
     @Bean
-    protected AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
+    public AuthenticationManager authenticationManager() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(autenticacaoService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return new ProviderManager(provider);
     }
 
-    // Configurações de autenticação
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(autenticacaoService).passwordEncoder(new BCryptPasswordEncoder());
-    }
-
-    // Configurações de autorização
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/api/auth").permitAll()
-                .antMatchers("/api/status").permitAll()
-                .antMatchers("/api/upload").permitAll()
-                .antMatchers("/api/image/**").permitAll()
-                .antMatchers("/api/download/**").permitAll()
-                .antMatchers("/api/resumo/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/rele/**").permitAll()
-                .anyRequest().authenticated()
-                .and().csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/api/auth", "/api/status", "/api/upload", "/api/image/**",
+                        "/api/download/**", "/api/resumo/**", "/swagger-ui/**", "/v3/api-docs/**",
+                        "/swagger-ui.html").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/rele/**").permitAll()
+                .anyRequest().authenticated())
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new AutenticacaoViaTokenFilter(tokenService, usuarioRepository),
                         UsernamePasswordAuthenticationFilter.class);
-    }
-
-    // Configurações de recursos estáticos
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        // Liberando acesso ao Swagger
-        web.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html");
+        return http.build();
     }
 
     @Bean

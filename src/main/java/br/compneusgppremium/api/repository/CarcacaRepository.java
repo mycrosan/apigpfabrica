@@ -9,7 +9,7 @@ import org.springframework.security.access.prepost.PostFilter;
 
 import java.util.List;
 
-@RepositoryRestResource(collectionResourceRel = "carcaca", path = "carcaca")
+@RepositoryRestResource(exported = false)
 public interface CarcacaRepository extends CrudRepository<CarcacaModel, Integer> {
 
 //    @Query("from carcaca c where c.numero_etiqueta=:numeroEtiqueta and c.status='start'")
@@ -52,4 +52,9 @@ public interface CarcacaRepository extends CrudRepository<CarcacaModel, Integer>
     @Query("select c.medida.id from carcaca c where c.modelo.id = :modeloId group by c.medida.id having count(c) >= :minOcorrencias")
     public List<Integer> findMedidaIdsFrequentesPorModelo(@Param("modeloId") Integer modeloId, @Param("minOcorrencias") long minOcorrencias);
 
+    @Query("from carcaca c where c.numero_etiqueta = :etiqueta")
+    List<CarcacaModel> buscarEtiqueta(@Param("etiqueta") String etiqueta);
+
+    @Query("from carcaca c where c.status = 'start' or c.status_carcaca.id = 1 order by c.dt_create desc")
+    List<CarcacaModel> listarRecentes(org.springframework.data.domain.Pageable paginacao);
 }

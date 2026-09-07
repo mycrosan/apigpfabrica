@@ -3,7 +3,7 @@ package br.compneusgppremium.api.controller.form;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "Dados para autenticação do usuário")
 public class LoginForm {

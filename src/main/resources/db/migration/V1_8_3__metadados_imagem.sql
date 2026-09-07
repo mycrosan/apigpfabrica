@@ -1,0 +1,2 @@
+ALTER TABLE leitura_imagem ADD COLUMN mime VARCHAR(32) NULL,
+ ADD COLUMN largura INT NULL, ADD COLUMN altura INT NULL;

@@ -3,7 +3,7 @@ package br.compneusgppremium.api.controller.dto;
 import br.compneusgppremium.api.controller.model.PneuVulcanizadoModel.StatusVulcanizacao;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * DTO para atualização de pneu vulcanizado

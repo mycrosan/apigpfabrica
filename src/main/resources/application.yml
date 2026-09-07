@@ -1,0 +1,53 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    open-in-view: true # Compatibilidade dos endpoints legados ainda não migrados para DTO.
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
+  data:
+    rest:
+      base-path: /api
+  servlet:
+    multipart:
+      max-file-size: 12MB
+      max-request-size: 12MB
+gppremium:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION:86400000}
+pneus:
+  revisao:
+    diretorio: ${REVISAO_DIRETORIO:./uploads/revisao}
+    coleta-habilitada: ${REVISAO_COLETA:true}
+    intervalo-ms: 60000
+  evidencias:
+    diretorio: ${EVIDENCIAS_DIRETORIO:./uploads/leitura}
+    reconciliacao-habilitada: ${EVIDENCIAS_RECONCILIACAO:false}
+    reconciliacao-intervalo-ms: 60000
+  politica:
+    fuso: America/Sao_Paulo
+    ano-minimo: 2000
+    validar-semana-futura: false
+    tolerancia-semanas: 0
+    segmentos: [PASSEIO, VAN, CAMINHONETE]
+    familias-medida: [METRICA_RADIAL, POLEGADAS_RADIAL, FLUTUACAO]
+  ocr:
+    url: ${OCR_URL:http://localhost:8091}
+    token: ${OCR_TOKEN:}
+    timeout-segundos: 15
+    habilitado: false
+    campos-aprovados: []
+    escore-minimo: 0.90
+    limite-bytes: 8388608
+    limite-pixels: 20000000
+    # Proteção de circuito: evita que cada operador espere o timeout inteiro com o serviço fora do ar.
+    falhas-para-abrir: 3
+    abertura-segundos: 30

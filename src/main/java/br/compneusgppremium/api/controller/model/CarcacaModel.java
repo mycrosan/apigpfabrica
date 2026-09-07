@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import org.springframework.stereotype.Service;
 
@@ -54,6 +54,13 @@ public class CarcacaModel {
     @Convert(converter = JpaConverterJson.class)
     @Schema(description = "URLs das fotos da carcaça em formato JSON")
     public String fotos;
+
+    @Column
+    @Convert(converter = JpaConverterJson.class)
+    @Schema(description = "Metadados de origem de cada campo lido no cadastro guiado por fotos: uma entrada por "
+            + "tentativa (campo, se veio de IA ou seleção manual, confiança, foto associada, e quem/quando no "
+            + "caso de inserção manual), em formato JSON")
+    public String leituraMetadados;
 
     @ManyToOne
     @Schema(description = "Status específico da carcaça")

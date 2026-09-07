@@ -4,7 +4,7 @@ import br.compneusgppremium.api.controller.model.StatusMaquina;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 @Data
 @Schema(description = "DTO para atualização de registro de máquina")

@@ -2,7 +2,7 @@ package br.compneusgppremium.api.controller.model;
 
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity(name = "auditoria")

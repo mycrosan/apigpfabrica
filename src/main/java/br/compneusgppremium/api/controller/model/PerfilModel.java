@@ -3,7 +3,7 @@ package br.compneusgppremium.api.controller.model;
 
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity(name = "perfil")
 

@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletOutputStream;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletOutputStream;
 
 @Service
 public class FilesStorageServiceImpl implements FilesStorageService {

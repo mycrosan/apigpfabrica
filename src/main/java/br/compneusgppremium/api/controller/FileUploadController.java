@@ -1,5 +1,9 @@
 package br.compneusgppremium.api.controller;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,6 +12,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import br.compneusgppremium.api.message.ResponseMessage;
 import br.compneusgppremium.api.service.FilesStorageService;
@@ -26,7 +36,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class FileUploadController {
@@ -37,10 +47,18 @@ public class FileUploadController {
 //    private static String caminhoImagem = new OperationSystem().placeImageSystem();
 
 
+    // Maior lado (em px) das fotos de carcaça depois de comprimidas no servidor —
+    // close-up de um campo do pneu não precisa de mais resolução que isso pra IA
+    // ou pro operador conferirem depois. Mantém o servidor de encher de fotos
+    // grandes agora que o cadastro guiado tira até 15 fotos por carcaça.
+    private static final int CARCACA_MAX_LADO_PX = 1280;
+    private static final float CARCACA_QUALIDADE_JPEG = 0.7f;
+
     @PostMapping("/api/upload")
     public Object uploadFiles(@RequestParam("title") String title, @RequestParam("files") MultipartFile[] files) {
         String message = "";
         String caminhoImagem = new OperationSystem().placeImageSystem(title);
+        boolean comprimir = "carcaca".equals(title);
 
         try {
             List<String> fileNames = new ArrayList<>();
@@ -50,14 +68,18 @@ public class FileUploadController {
                 var ext = FilenameUtils.getExtension(file.getOriginalFilename());
                 var fname = UUID.randomUUID().toString();
 
-                if (ext != "")//if ext is there concat
-                    fname += "." + ext;
-
                 try {
-//                    String realPath = request.getServletContext().getRealPath("");
-                    String filename = file.getOriginalFilename(); // Give a random filename here.
                     byte[] bytes = file.getBytes();
-//                    Path insPath = Path.of(Paths.get("C:\\Users\\Servo\\Documents\\www\\gppremium\\uploads\\").toString());
+                    if (comprimir) {
+                        byte[] comprimido = comprimirImagem(bytes);
+                        if (comprimido != null) {
+                            bytes = comprimido;
+                            ext = "jpg"; // sempre reencodada como JPEG quando a compressão funciona
+                        }
+                    }
+                    if (ext != null && !ext.isEmpty()) {
+                        fname += "." + ext;
+                    }
                     String insPathN = caminhoImagem + fname;
                     Files.write(Paths.get(insPathN), bytes);
                     fileNames.add(fname);
@@ -105,5 +127,51 @@ public class FileUploadController {
 
     private Object renameValueToUid() {
         return null;
+    }
+
+    // Redimensiona (maior lado <= CARCACA_MAX_LADO_PX) e reencoda como JPEG com
+    // qualidade reduzida, pra não pesar o disco do servidor. Retorna null se a
+    // imagem não puder ser decodificada (formato não suportado/corrompida) — nesse
+    // caso o chamador grava os bytes originais, sem quebrar o upload.
+    private byte[] comprimirImagem(byte[] original) {
+        try {
+            BufferedImage imagem = ImageIO.read(new ByteArrayInputStream(original));
+            if (imagem == null) {
+                return null;
+            }
+
+            int largura = imagem.getWidth();
+            int altura = imagem.getHeight();
+            int maiorLado = Math.max(largura, altura);
+            BufferedImage redimensionada = imagem;
+            if (maiorLado > CARCACA_MAX_LADO_PX) {
+                double escala = CARCACA_MAX_LADO_PX / (double) maiorLado;
+                int novaLargura = Math.max(1, (int) Math.round(largura * escala));
+                int novaAltura = Math.max(1, (int) Math.round(altura * escala));
+                Image escalada = imagem.getScaledInstance(novaLargura, novaAltura, Image.SCALE_SMOOTH);
+                redimensionada = new BufferedImage(novaLargura, novaAltura, BufferedImage.TYPE_INT_RGB);
+                redimensionada.getGraphics().drawImage(escalada, 0, 0, null);
+            } else if (imagem.getType() != BufferedImage.TYPE_INT_RGB) {
+                // JPEG não suporta transparência — garante fundo opaco ao reencodar PNGs/etc.
+                BufferedImage semAlfa = new BufferedImage(largura, altura, BufferedImage.TYPE_INT_RGB);
+                semAlfa.getGraphics().drawImage(imagem, 0, 0, null);
+                redimensionada = semAlfa;
+            }
+
+            ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+            ImageWriteParam parametros = writer.getDefaultWriteParam();
+            parametros.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            parametros.setCompressionQuality(CARCACA_QUALIDADE_JPEG);
+
+            ByteArrayOutputStream saida = new ByteArrayOutputStream();
+            writer.setOutput(new MemoryCacheImageOutputStream(saida));
+            writer.write(null, new IIOImage(redimensionada, null, null), parametros);
+            writer.dispose();
+
+            return saida.toByteArray();
+        } catch (Exception ex) {
+            System.out.println("Falha ao comprimir imagem, gravando original: " + ex);
+            return null;
+        }
     }
 }

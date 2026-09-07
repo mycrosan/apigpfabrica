@@ -32,3 +32,11 @@ INSERT INTO tipo_classificacao (id, descricao) VALUES
 -- Inserir tipo de observação padrão vinculado a APROVADO
 INSERT INTO tipo_observacao (id, descricao, tipo_classificacao_id) VALUES 
 (1, 'Observação Padrão', 1);
+-- H2 2.x não avança a identidade ao inserir IDs explícitos no seed.
+ALTER TABLE maquina_registro ALTER COLUMN id RESTART WITH 10000;
+ALTER TABLE matriz ALTER COLUMN id RESTART WITH 10000;
+ALTER TABLE perfil ALTER COLUMN id RESTART WITH 10000;
+ALTER TABLE status_carcaca ALTER COLUMN id RESTART WITH 10000;
+ALTER TABLE tipo_classificacao ALTER COLUMN id RESTART WITH 10000;
+ALTER TABLE tipo_observacao ALTER COLUMN id RESTART WITH 10000;
+ALTER TABLE usuario ALTER COLUMN id RESTART WITH 10000;

@@ -2,7 +2,7 @@ package br.compneusgppremium.api.controller.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 /**
  * DTO para atualização de configuração de máquina
