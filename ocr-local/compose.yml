@@ -1,13 +1,15 @@
 services:
   ocr:
+    image: fabrica-ocr:local
+    pull_policy: never
     build: .
+    restart: unless-stopped
     environment:
       OCR_TOKEN: ${OCR_TOKEN:?Configure um token interno}
       OCR_MODELS_DIR: /models
+      OCR_PERFIL_DOT: ${OCR_PERFIL_DOT:-dot-relevo-v1}
     volumes:
       - ./models:/models:ro
-    ports:
-      - "127.0.0.1:8091:8091"
     networks: [ocr_interna]
     read_only: true
     tmpfs: [/tmp]
@@ -18,6 +20,24 @@ services:
       interval: 30s
       timeout: 5s
       start_period: 120s
+  acesso-local:
+    image: fabrica-ocr:local
+    pull_policy: never
+    restart: unless-stopped
+    command: ["python", "/ponte_local.py"]
+    volumes:
+      - ./ponte_local.py:/ponte_local.py:ro
+    ports:
+      - "127.0.0.1:8091:8091"
+    networks: [acesso_host, ocr_interna]
+    depends_on:
+      ocr:
+        condition: service_healthy
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
 networks:
+  acesso_host:
   ocr_interna:
     internal: true

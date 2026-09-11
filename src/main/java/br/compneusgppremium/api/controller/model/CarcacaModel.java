@@ -33,7 +33,7 @@ public class CarcacaModel {
     @Schema(description = "Status da carcaça", example = "Ativo")
     private String status;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     @Convert(converter = JpaConverterJson.class)
     @Schema(description = "Dados adicionais da carcaça em formato JSON")
     private String dados;
@@ -50,12 +50,12 @@ public class CarcacaModel {
     @Schema(description = "País de origem da carcaça")
     public PaisModel pais;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     @Convert(converter = JpaConverterJson.class)
     @Schema(description = "URLs das fotos da carcaça em formato JSON")
     public String fotos;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     @Convert(converter = JpaConverterJson.class)
     @Schema(description = "Metadados de origem de cada campo lido no cadastro guiado por fotos: uma entrada por "
             + "tentativa (campo, se veio de IA ou seleção manual, confiança, foto associada, e quem/quando no "

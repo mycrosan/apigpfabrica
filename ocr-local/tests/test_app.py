@@ -12,7 +12,9 @@ class MotorTeste:
     versao = 'pesos-teste'
     def __init__(self, diretorio):
         pass
-    def reconhecer(self, imagem):
+    def preprocessamento(self, campo):
+        return 'exif-transpose-rgb-v1'
+    def reconhecer(self, imagem, campo=None):
         return [{'texto': '205/55R16', 'escore': 0.9, 'regiao': [[0, 0], [20, 0], [20, 20], [0, 20]]}]
 
 

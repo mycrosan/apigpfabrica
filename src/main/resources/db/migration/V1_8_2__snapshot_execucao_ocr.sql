@@ -1,4 +1,4 @@
-CREATE TABLE leitura_execucao (
+CREATE TABLE IF NOT EXISTS leitura_execucao (
  tentativa_id CHAR(36) PRIMARY KEY,
  snapshot_json LONGTEXT NOT NULL,
  hash_catalogo CHAR(64) NOT NULL,

@@ -28,6 +28,8 @@ public class TentativaLeituraService {
         String hash = ArquivosLeituraService.hash(contexto.getBytes(StandardCharsets.UTF_8));
         var existente = persistencia.existente(sessaoId, chave, hash);
         if (existente != null) {
+            log.info("leitura tentativa_reutilizada id={} sessao={} campo={}",
+                    org.slf4j.MDC.get("leituraId"), sessaoId, entrada.campo());
             return existente;
         }
         String arquivo = arquivos.salvar(bytes);
@@ -39,6 +41,8 @@ public class TentativaLeituraService {
             catch (RuntimeException reconciliacao) { erro.addSuppressed(reconciliacao); }
             throw erro;
         }
+        log.info("leitura tentativa_preparada id={} sessao={} tentativa={} campo={}",
+                org.slf4j.MDC.get("leituraId"), sessaoId, tentativaId, entrada.campo());
         ResultadoLeituraDTO resultado;
         br.compneusgppremium.api.leitura.dto.ExecucaoLeituraDTO execucao = null;
         try {

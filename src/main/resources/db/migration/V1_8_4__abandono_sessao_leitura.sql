@@ -1,6 +1,46 @@
--- Abandono explícito de sessão: encerra a coleta sem apagar evidência já produzida.
--- Autor e horário são gravados pelo servidor; o motivo acompanha a sessão para a revisão posterior.
-ALTER TABLE leitura_sessao ADD COLUMN motivo_abandono VARCHAR(1024) NULL,
- ADD COLUMN abandonada_em DATETIME(6) NULL,
- ADD COLUMN abandonada_por INT NULL,
- ADD CONSTRAINT fk_leitura_sessao_abandono FOREIGN KEY (abandonada_por) REFERENCES usuario(id);
+DELIMITER $$
+DROP PROCEDURE IF EXISTS add_col_if_not_exists $$
+CREATE PROCEDURE add_col_if_not_exists(
+    IN p_table VARCHAR(128), IN p_col VARCHAR(128), IN p_def TEXT
+)
+BEGIN
+    DECLARE existe INT DEFAULT 0;
+    SELECT COUNT(*) INTO existe
+    FROM information_schema.columns c
+    WHERE c.table_schema = DATABASE() AND c.table_name = p_table AND c.column_name = p_col;
+    IF existe = 0 THEN
+        SET @__ddl = CONCAT('ALTER TABLE `', p_table, '` ADD COLUMN `', p_col, '` ', p_def);
+        PREPARE stmt FROM @__ddl;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END IF;
+END $$
+DROP PROCEDURE IF EXISTS add_fk_if_not_exists $$
+CREATE PROCEDURE add_fk_if_not_exists(
+    IN p_table VARCHAR(128), IN p_fk VARCHAR(128), IN p_def TEXT
+)
+BEGIN
+    DECLARE existe INT DEFAULT 0;
+    SELECT COUNT(*) INTO existe
+    FROM information_schema.table_constraints tc
+    WHERE tc.constraint_type = 'FOREIGN KEY'
+      AND tc.table_schema = DATABASE()
+      AND tc.table_name = p_table
+      AND tc.constraint_name = p_fk;
+    IF existe = 0 THEN
+        SET @__ddl = CONCAT('ALTER TABLE `', p_table, '` ADD CONSTRAINT `', p_fk, '` ', p_def);
+        PREPARE stmt FROM @__ddl;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END IF;
+END $$
+DELIMITER ;
+
+CALL add_col_if_not_exists('leitura_sessao', 'motivo_abandono',  'VARCHAR(1024) NULL');
+CALL add_col_if_not_exists('leitura_sessao', 'abandonada_em',    'DATETIME(6) NULL');
+CALL add_col_if_not_exists('leitura_sessao', 'abandonada_por',   'INT NULL');
+CALL add_fk_if_not_exists('leitura_sessao', 'fk_leitura_sessao_abandono',
+    'FOREIGN KEY (abandonada_por) REFERENCES usuario(id)');
+
+DROP PROCEDURE IF EXISTS add_col_if_not_exists;
+DROP PROCEDURE IF EXISTS add_fk_if_not_exists;

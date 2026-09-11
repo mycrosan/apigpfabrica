@@ -26,7 +26,7 @@ public class QualidadeModel {
     @Schema(description = "Observação sobre a qualidade", example = "Pneu aprovado sem defeitos")
     private String observacao;
     
-    @Column
+    @Column(columnDefinition = "TEXT")
     @Convert(converter = JpaConverterJson.class)
     @Schema(description = "URLs das fotos do controle de qualidade em formato JSON")
     public String fotos;

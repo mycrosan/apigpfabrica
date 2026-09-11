@@ -13,10 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LeituraCarcacaService {
     public enum Campo { DOT, MARCA, MODELO, MEDIDA, PAIS }
     private static final String PREPROCESSAMENTO = "exif-transpose-rgb-v1";
@@ -33,11 +36,17 @@ public class LeituraCarcacaService {
     }
     public ExecucaoLeituraDTO analisarComEvidencia(final Campo campo, final String foto, final Integer marcaId,
             final Integer modeloId) {
+        log.info("leitura campo_recebido id={} campo={} marcaContexto={} modeloContexto={}",
+                MDC.get("leituraId"), campo, marcaId, modeloId);
         var snapshot = catalogo.snapshot(campo.name(), marcaId, modeloId);
         byte[] bytes = imagens.validar(foto);
         OcrResposta leitura = extrair(campo, bytes, snapshot);
         try {
-            return montar(campo, decidir(campo, leitura, snapshot), leitura, snapshot);
+            var resultado = decidir(campo, leitura, snapshot);
+            log.info("leitura decisao id={} campo={} estado={} motivos={} candidatos={} campoAprovado={} escoreMinimo={} politica={}",
+                    MDC.get("leituraId"), campo, resultado.estado(), resultado.motivos(), resultado.candidatos().size(),
+                    configuracao.camposAprovados().contains(campo.name()), configuracao.escoreMinimo(), POLITICA);
+            return montar(campo, resultado, leitura, snapshot);
         } catch (RuntimeException erro) {
             // A extração já custou foto e inferência: preservá-la separa falha de resolução de falha de leitura.
             throw falha(campo, snapshot, leitura, "FALHA_RESOLUCAO",
@@ -85,7 +94,9 @@ public class LeituraCarcacaService {
     }
     private ExecucaoLeituraDTO montar(final Campo campo, final ResultadoLeituraDTO resultado,
             final OcrResposta leitura, final Map<Integer, String> snapshot) {
-        return new ExecucaoLeituraDTO(resultado, leitura, snapshot, PREPROCESSAMENTO, NORMALIZACAO, POLITICA,
+        String preprocessamento = leitura != null && leitura.versaoPreprocessamento() != null
+                && !leitura.versaoPreprocessamento().isBlank() ? leitura.versaoPreprocessamento() : PREPROCESSAMENTO;
+        return new ExecucaoLeituraDTO(resultado, leitura, snapshot, preprocessamento, NORMALIZACAO, POLITICA,
                 configuracao.escoreMinimo(), configuracao.camposAprovados().contains(campo.name()),
                 identificacao.atual());
     }
@@ -113,8 +124,31 @@ public class LeituraCarcacaService {
         ResultadoLeituraDTO resultado = analisar(campo, foto, marcaId, modeloId);
         LeituraCampoDTO legado = new LeituraCampoDTO();
         legado.setTexto(resultado.textoOriginal());
-        // O cliente antigo resolve a etapa automaticamente: somente v2 poderá liberar sugestões confirmáveis.
         legado.setConfianca("BAIXA");
+        legado.setMensagem(mensagemLegada(resultado));
+        // Só o estado SUGESTAO devolve valor: campo aprovado em configuração e escore acima do mínimo.
+        // A tela preenche o campo com esse valor, mas a etapa só fecha com confirmação do operador —
+        // ambiguidade e leitura fraca continuam sem preenchimento, como exige a política de decisão.
+        if ("SUGESTAO".equals(resultado.estado())) {
+            legado.setConfianca("ALTA");
+            if (campo == Campo.DOT) {
+                legado.setDot(resultado.valorSugerido());
+                legado.setDotCompleto(resultado.textoOriginal());
+            } else {
+                legado.setId(resultado.itemSugeridoId());
+            }
+        }
         return legado;
+    }
+
+    private String mensagemLegada(final ResultadoLeituraDTO resultado) {
+        if (resultado.motivos().contains("MODELO_NAO_APROVADO")) {
+            return "A foto foi processada, mas as sugestões deste campo ainda não estão liberadas. "
+                    + "Confira a foto e informe o valor manualmente.";
+        }
+        if ("SUGESTAO".equals(resultado.estado())) {
+            return "Leitura automática. Confira a foto e confirme o valor.";
+        }
+        return resultado.mensagem();
     }
 }

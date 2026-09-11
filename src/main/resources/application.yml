@@ -1,6 +1,6 @@
 spring:
   config:
-    import: optional:file:.env[.properties]
+    import: optional:file:.env[.properties],optional:file:ocr-local/.env[.properties]
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
@@ -11,7 +11,14 @@ spring:
       ddl-auto: validate
   flyway:
     enabled: true
-    baseline-on-migrate: false
+    # Cria linha de baseline automaticamente em bancos SEM flyway_schema_history.
+    # Marcamos o estado inicial como sendo a 1.9.0 (a ultima migration estrutural):
+    # assim o Flyway considera V1.7.1 -> V1.9.0 ja aplicadas e so executa V1.9.1+.
+    # Como todas as migrations estruturais ja foram ajustadas para IF NOT EXISTS,
+    # mesmo que o baseline falhe em detectar, a reexecucao eh segura.
+    baseline-on-migrate: true
+    baseline-version: 1.9.0
+    baseline-description: baseline-estado-legado-fabrica
   data:
     rest:
       base-path: /api
@@ -40,11 +47,16 @@ pneus:
     segmentos: [PASSEIO, VAN, CAMINHONETE]
     familias-medida: [METRICA_RADIAL, POLEGADAS_RADIAL, FLUTUACAO]
   ocr:
+    diagnostico:
+      salvar-json: ${OCR_DIAGNOSTICO_SALVAR_JSON:true}
+      diretorio: ${OCR_DIAGNOSTICO_DIRETORIO:diagnostico-ocr}
     url: ${OCR_URL:http://localhost:8091}
     token: ${OCR_TOKEN:}
     timeout-segundos: 15
-    habilitado: false
-    campos-aprovados: []
+    habilitado: ${PNEUS_OCR_HABILITADO:false}
+    # Campos cujo resultado do OCR pode virar sugestão na tela. Sugestão sempre exige
+    # confirmação do operador; campo fora desta lista continua manual.
+    campos-aprovados: ${PNEUS_OCR_CAMPOS_APROVADOS:DOT}
     escore-minimo: 0.90
     limite-bytes: 8388608
     limite-pixels: 20000000

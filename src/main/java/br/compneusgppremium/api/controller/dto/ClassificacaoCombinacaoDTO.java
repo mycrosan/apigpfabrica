@@ -15,4 +15,7 @@ public class ClassificacaoCombinacaoDTO {
 
     @Schema(description = "Mensagem explicando a classificação, para exibir ao operador")
     private String mensagem;
+
+    @Schema(description = "Quantidade de carcaças cadastradas com o mesmo modelo, medida e país; não comprova leitura correta")
+    private Long quantidadeCadastrada;
 }

@@ -31,6 +31,14 @@ class LeituraCarcacaServiceTest {
         return new LeituraCarcacaService(motor, politica, imagens, catalogo, identificacao(politica));
     }
     @Test
+    void preservaVersaoDoPreprocessamentoRecebidaDoOcr() {
+        var servico = servico(false, "", List.of());
+        when(motor.ler(anyString(), anyString())).thenReturn(new OcrResposta("PADDLEOCR", "3.3.2", "pesos-perfil",
+                "DOT", List.of(), 10, "exif-transpose-rgb-dot-relevo-v1"));
+        var evidencia = servico.analisarComEvidencia(LeituraCarcacaService.Campo.DOT, "foto", null, null);
+        assertThat(evidencia.preprocessamento()).isEqualTo("exif-transpose-rgb-dot-relevo-v1");
+    }
+    @Test
     void ilegivelNaoProduzValorOuId() {
         var resultado = servico(true, "", List.of()).analisar(LeituraCarcacaService.Campo.MEDIDA, "foto", 1, 2);
         assertThat(resultado.estado()).isEqualTo("ILEGIVEL"); assertThat(resultado.mensagem()).contains("Não consegui ler");
@@ -111,9 +119,49 @@ class LeituraCarcacaServiceTest {
     }
 
     @Test
-    void legadoNaoPodeResolverEtapaAutomaticamente() {
+    void legadoEntregaSugestaoDeCampoAprovado() {
         var resposta = servico(true, "205/55R16", List.of(new Candidato(1, "205/55R16", 0.98)))
                 .lerCampo(LeituraCarcacaService.Campo.MEDIDA, "foto", 1, 2);
+        assertThat(resposta.getConfianca()).isEqualTo("ALTA");
+        assertThat(resposta.getId()).isEqualTo(1);
+        assertThat(resposta.getMensagem()).contains("confirme o valor");
+    }
+
+    @Test
+    void legadoEntregaDotComOsQuatroDigitos() {
+        var ocr = new OcrLocalProperties(URI.create("http://localhost:8091"), "token-interno-teste", 15,
+                true, Set.of("DOT"), 0.9, 8388608, 20000000, 3, 30);
+        when(imagens.validar(anyString())).thenReturn(new byte[] {1});
+        when(motor.ler(anyString(), anyString())).thenReturn(new OcrResposta("PADDLEOCR", "3.3.2", "pesos-fixos",
+                "DOT", List.of(new OcrResposta.Linha("3923", 0.99, List.of())), 10));
+        when(catalogo.snapshot(anyString(), any(), any())).thenReturn(Map.of());
+        when(catalogo.resolverSnapshot(anyString(), anyList(), anyMap()))
+                .thenReturn(List.of(new Candidato(null, "3923", 0.99)));
+        var resposta = new LeituraCarcacaService(motor, ocr, imagens, catalogo, identificacao(ocr))
+                .lerCampo(LeituraCarcacaService.Campo.DOT, "foto", null, null);
+        assertThat(resposta.getDot()).isEqualTo("3923");
+        assertThat(resposta.getDotCompleto()).isEqualTo("3923");
+        assertThat(resposta.getConfianca()).isEqualTo("ALTA");
+        assertThat(resposta.getId()).isNull();
+    }
+
+    @Test
+    void legadoNaoEntregaValorComEscoreAbaixoDoMinimo() {
+        var resposta = servico(true, "205/55R16", List.of(new Candidato(1, "205/55R16", 0.6)))
+                .lerCampo(LeituraCarcacaService.Campo.MEDIDA, "foto", 1, 2);
         assertThat(resposta.getConfianca()).isEqualTo("BAIXA");
+        assertThat(resposta.getId()).isNull();
+        assertThat(resposta.getDot()).isNull();
+    }
+
+    @Test
+    void legadoDistingueCampoNaoAprovadoDeFotoIlegivel() {
+        var resposta = servico(false, "205/55R16", List.of(new Candidato(1, "205/55R16", 0.98)))
+                .lerCampo(LeituraCarcacaService.Campo.MEDIDA, "foto", 1, 2);
+        assertThat(resposta.getMensagem()).contains("ainda não estão liberadas");
+        assertThat(resposta.getConfianca()).isEqualTo("BAIXA");
+        var ilegivel = servico(false, "", List.of())
+                .lerCampo(LeituraCarcacaService.Campo.MEDIDA, "foto", 1, 2);
+        assertThat(ilegivel.getMensagem()).contains("Não consegui ler");
     }
 }

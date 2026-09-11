@@ -103,7 +103,7 @@ def criar_app(fabrica_motor=MotorLocal):
         imagem = decodificar(entrada.foto_base64)
         inicio = time.monotonic()
         try:
-            linhas = await run_in_threadpool(aplicacao.state.motor.reconhecer, imagem)
+            linhas = await run_in_threadpool(aplicacao.state.motor.reconhecer, imagem, entrada.campo)
         except BlockingIOError as erro:
             raise HTTPException(503, 'OCR ocupado; tente novamente') from erro
         except Exception as erro:
@@ -114,6 +114,7 @@ def criar_app(fabrica_motor=MotorLocal):
         return {
             'motor': 'PADDLEOCR', 'versaoBiblioteca': '3.3.2',
             'versaoModelo': aplicacao.state.motor.versao, 'campo': entrada.campo,
+            'versaoPreprocessamento': aplicacao.state.motor.preprocessamento(entrada.campo),
             'linhas': linhas, 'duracaoMs': round((time.monotonic() - inicio) * 1000),
         }
 

@@ -21,4 +21,7 @@ public class LeituraCampoDTO {
 
     @Schema(description = "Confiança da leitura: ALTA, MEDIA ou BAIXA")
     private String confianca;
+
+    @Schema(description = "Motivo da ausência de sugestão e orientação para o operador")
+    private String mensagem;
 }

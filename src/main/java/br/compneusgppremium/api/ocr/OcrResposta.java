@@ -3,7 +3,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record OcrResposta(String motor, String versaoBiblioteca, String versaoModelo,
-        String campo, List<Linha> linhas, long duracaoMs) {
+        String campo, List<Linha> linhas, long duracaoMs, String versaoPreprocessamento) {
+    public OcrResposta(String motor, String versaoBiblioteca, String versaoModelo,
+            String campo, List<Linha> linhas, long duracaoMs) {
+        this(motor, versaoBiblioteca, versaoModelo, campo, linhas, duracaoMs, null);
+    }
     public OcrResposta {
         linhas = List.copyOf(linhas);
     }

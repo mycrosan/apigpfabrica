@@ -183,6 +183,16 @@ class ResolverCatalogoPneuServiceTest {
         assertThat(resolvedor.resolver("DOT", List.of(linha("3625 3625", 0.99)), null, null)).hasSize(1);
     }
 
+    // O detector devolve a mesma marcação em relevo em duas regiões sobrepostas; sem a
+    // deduplicação entre linhas isso viraria ambiguidade e nenhuma sugestão chegaria à tela.
+    @Test
+    void dotRepetidoEmLinhasDiferentesNaoViraAmbiguidade() {
+        var candidatos = resolvedor.resolver("DOT",
+                List.of(linha("3625", 0.998), linha("3625", 0.997)), null, null);
+        assertThat(candidatos).hasSize(1);
+        assertThat(candidatos.get(0).texto()).isEqualTo("3625");
+    }
+
     @Test
     void dotAmbiguoPreservaTodosOsCandidatosSemEscolher() {
         var candidatos = resolvedor.resolver("DOT", List.of(linha("3625 0126", 0.99)), null, null);

@@ -1,9 +1,9 @@
-CREATE TABLE revisao_imagem (
+CREATE TABLE IF NOT EXISTS revisao_imagem (
  id CHAR(36) PRIMARY KEY, sha256 CHAR(64) NOT NULL UNIQUE,
  arquivo VARCHAR(255) NOT NULL, previa VARCHAR(255) NOT NULL, hash_previa CHAR(64) NOT NULL,
  largura INT NOT NULL, altura INT NOT NULL, criada_em DATETIME(6) NOT NULL
 ) ENGINE=InnoDB;
-CREATE TABLE revisao_item (
+CREATE TABLE IF NOT EXISTS revisao_item (
  id CHAR(36) PRIMARY KEY, chave_origem CHAR(64) NOT NULL UNIQUE,
  imagem_id CHAR(36) NOT NULL, origem VARCHAR(24) NOT NULL,
  sessao_id CHAR(36), tentativa_id CHAR(36), confirmacao_id CHAR(36), operador_id INT,
@@ -20,7 +20,7 @@ CREATE TABLE revisao_item (
  INDEX idx_revisao_fila (estado, criada_em), INDEX idx_revisao_contexto (marca_id, modelo_id),
  INDEX idx_revisao_sessao (sessao_id)
 ) ENGINE=InnoDB;
-CREATE TABLE revisao_resposta (
+CREATE TABLE IF NOT EXISTS revisao_resposta (
  id CHAR(36) PRIMARY KEY, item_id CHAR(36) NOT NULL, revisor_id INT NOT NULL,
  chave CHAR(36) NOT NULL, hash_requisicao CHAR(64) NOT NULL,
  ciclo INT NOT NULL, campo VARCHAR(10), transcricao VARCHAR(512),

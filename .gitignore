@@ -50,3 +50,5 @@ Dump*.sql
 .xdg_state/
 .env
 .env.local
+
+/diagnostico-ocr/

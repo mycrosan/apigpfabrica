@@ -24,6 +24,10 @@ public class JpaConverterJson implements AttributeConverter<Object, String> {
 
     @Override
     public Object convertToEntityAttribute(String dbData) {
+        // Campos opcionais de cadastros legados podem conter SQL NULL.
+        if (dbData == null) {
+            return null;
+        }
         try {
             return objectMapper.readValue(dbData, Object.class);
         } catch (IOException ex) {

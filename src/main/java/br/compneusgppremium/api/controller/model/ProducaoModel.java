@@ -26,7 +26,7 @@ public class ProducaoModel {
     @Schema(description = "Medida do pneu após raspagem", example = "15.5")
     private Double medida_pneu_raspado;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     @Convert(converter = JpaConverterJson.class)
     @Schema(description = "Dados adicionais da produção em formato JSON")
     public String dados;
@@ -35,7 +35,7 @@ public class ProducaoModel {
     @Schema(description = "Regra aplicada na produção")
     private RegraModel regra;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     @Convert(converter = JpaConverterJson.class)
     @Schema(description = "URLs das fotos da produção em formato JSON")
     public String fotos;

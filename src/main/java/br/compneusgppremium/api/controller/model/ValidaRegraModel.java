@@ -12,7 +12,7 @@ public class ValidaRegraModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     @Convert(converter = JpaConverterJson.class)
     private String dados;
 

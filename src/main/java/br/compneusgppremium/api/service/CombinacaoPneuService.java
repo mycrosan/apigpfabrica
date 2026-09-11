@@ -50,13 +50,15 @@ public class CombinacaoPneuService {
             return dto;
         }
 
+        long quantidade = carcacaRepository.countPorTrio(modeloId, medidaId, paisId);
+        dto.setQuantidadeCadastrada(quantidade);
         if (regraRepository.existeParaTrio(modeloId, medidaId, paisId)) {
             dto.setClassificacao("VERDE");
             dto.setMensagem("Combinação com regra de produção cadastrada.");
             return dto;
         }
 
-        if (carcacaRepository.countPorTrio(modeloId, medidaId, paisId) > 0) {
+        if (quantidade > 0) {
             dto.setClassificacao("AMARELO");
             dto.setMensagem("Essa combinação já foi cadastrada antes, mas ainda não tem regra de "
                     + "produção cadastrada — provavelmente falta cadastrar a regra.");

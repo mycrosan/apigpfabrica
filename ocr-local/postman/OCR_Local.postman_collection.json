@@ -1,0 +1,226 @@
+{
+  "info": {
+    "_postman_id": "692ae178-6a82-4600-81a9-df3eaabe776c",
+    "name": "Fábrica GP — PaddleOCR local",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Teste direto do OCR Python local, sem a API Java. Importe o ambiente OCR local, configure o token interno e execute 01, 02 e 03. Para uma foto real, prepare o JSON com preparar_foto.py e selecione-o no Body binary da requisição 04. Consulte README.md. Não sincronize fotos, token ou respostas com serviços externos."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{ocr_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "01 — Saúde do processo",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{ocr_base_url}}/health",
+        "description": "Confirma que o processo responde. Não garante modelos carregados.",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "if (pm.response.code === 200) pm.test(\"Processo ativo\", function () { pm.expect(pm.response.json().status).to.eql(\"ativo\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 — Modelos prontos",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{ocr_base_url}}/ready",
+        "description": "Confirma carregamento dos pesos locais. HTTP 503 significa que o motor não está pronto.",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "if (pm.response.code === 200) pm.test(\"Modelos carregados\", function () { const r = pm.response.json(); pm.expect(r.status).to.eql(\"pronto\"); pm.expect(r.versaoModelo).to.be.a(\"string\").and.not.empty; });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 — Reconhecer DOT sintético",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{ocr_base_url}}/v1/reconhecer",
+        "description": "Imagem sintética de DOT 3625 já incluída. Verifica o motor; não mede precisão em pneus reais.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"campo\": \"DOT\",\n  \"foto_base64\": \"iVBORw0KGgoAAAANSUhEUgAAA4QAAAC0CAIAAABDvnVcAAAcnElEQVR4nO3dd1RUZ8LH8TsgRawUkahRY2RjF3Tta8Xeolg3RBOsObFmdxXRaNSsDXXV1eOxb+xRsYu9EaJiUGxELGDJigoooIIyCMz7B3s4930uM9wZRi/g9/PffXzaDJzjj+fe+zw6g8EgAQAAAFqw0XoCAAAA+HARRgEAAKAZwigAAAA0QxgFAACAZgijAAAA0AxhFAAAAJohjAIAAEAzhFEAAABohjAKAAAAzRBGAQAAoBnCKAAAADRDGAUAAIBmCKMAAADQDGEUAAAAmiGMAgAAQDOEUQAAAGiGMAoAAADNEEYBAACgGcIoAAAANEMYBQAAgGYIowAAANAMYRQAAACaIYwCAABAM4RRAAAAaIYwCgAAAM0QRgEAAKAZwigAAAA0QxgFAACAZgijAAAA0AxhFAAAAJohjAIAAEAzhFEAAABohjAKAAAAzRBGAQAAoBnCKAAAADRDGAUAAIBmCKMAAADQDGEUAAAAmiGMAgAAQDOEUQAAAGiGMAoAAADNEEYBAACgGcIoAAAANEMYBQAAgGYIowAAANAMYRQAAACaIYwCAABAM4RRAAAAaIYwCgAAAM0QRgEAAKAZwigAAAA0QxgFAACAZgijAAAA0AxhFAAAAJohjAIAAEAzhFEAAABohjAKAAAAzRBGAQAAoBnCKAAAADRDGAUAAIBmCKMAAADQDGEUAAAAmiGMAgAAQDOEUQAAAGiGMAoAAADNlNB6AsC7kpiYePLkydDQ0MuXLz979uz58+d6vd7V1dXV1bVOnTrt2rXr3Lnzp59+qvU0AQD4oOkMBsM77F2nU1PNxsbG3t7eycmpfPnyHh4en332WYMGDdq0aePl5WVj807WbjMzM8+fP//rr79GRkbeu3cvLi4uLS3tzZs3JUuWLFWqVOXKlWvUqNGoUaO//OUvLVu2LFHCvMiu8lMXnBV/dvfu3Tt16tT58+evXbv2/PnzpKQkvV7v7Ozs7Oxcq1atFi1adOzYsXHjxlYZS6/XHz169MiRI1euXLl3796LFy8cHBxcXV0rV67csmXLdu3adenSxdzvXBATExMUFLRp0ya9Xm+imo2NTb9+/aZPn16/fn2VPX/33XdLly4tyNwkSSpXrlxKSkoBOwEAoJgwvEsFnJuHh8f48eNv3rxpxSnduXPn22+/dXNzUzkHNze3b7/99s6dO+/tU6tnlS/k+PHj3bp1UxOgmzZtunv37oKM9ebNm7lz57q7u5seqGrVqkuWLHn79q1loyxfvtze3l7912hnZ7dq1SqVnfv6+qrv2Zhy5cpZ9tEAACh+CnUYzaHT6fr06XP37t0CTiYhIWHo0KGWLbXa2NgMHTo0ISHhvX1qNQr4hSQnJ/v5+Zk76MCBA5OSkiwY7rfffjPrnniTJk1u375t1hBZWVlffvmluZ8ox7Rp09QM0aRJE8v6lyOMAgCQqwiE0RwODg6LFi3Kzs62bCYHDhxwcXEp4BxcXFwOHDjwPj+1aZZ9FTkePnxYvXp1y8b19vZOSUkxa7itW7eatVqZw9nZ+dq1a+pHmThxotBDuXLlJk2adObMmSdPnuj1+sTExPDw8GnTppUvX1453Pbt2/MdomLFihZ9Z+KszPr2AAAoxt5rGPXz88uzWmZm5uvXrxMSEqKiooKDg8eMGfPZZ5/l+b+4r6/v69evzZ1GUFBQnreha9asOXny5EOHDsXExLx8+TIzM/Ply5cxMTGHDh2aPHlynst4Op1u4cKFBf5i/ke5MGmtnk178uRJzZo1haFdXFwCAgLOnDnz9OnTjIyMpKSky5cvz58//+OPP1Z+D23btlX/h8HmzZuFBenGjRuvXLkyKioqNTU1IyPjyZMnISEhw4cPd3BwEAZyd3e/f/++mlG2bt0qtO3Tp8+zZ8/yrJyYmNi+fXuhfpkyZYzVz6HX6+W/SMZ+nwEAgHqFIozm6ezZsz4+PnnGILPy6IIFC5SdNGzY8MiRI6YbZmdnHz58uEGDBsrmCxYsUD8BE7QKo126dBHGHT16dGpqap6V9Xr92LFjlV/Chg0b1IwVGhoqXxN1dHRcv369scq3bt1SvkvUpUuXfEd5/fq1EJr79++flZVlosmbN2/+/Oc/C2NNnjzZRJOYmBh55alTp+Y7MQAAYFrhDaM5Nm3aVLJkSaGf3r17q1yW27VrlzJFTZ06Vf3LMRkZGQEBAcpOgoODzf0sSpqE0e3btwuDBgUF5dvqb3/7m9CqatWq+bZKSkqqVKlSbhN7e/vTp0+bbpKQkKBck963b5/pVkFBQfL6VapUUfMgwc2bN21tbeUNy5cvn5mZaaz+6dOn5ZVXr16d7xAAAMC0wh5GDQbDlStXlI97zp07N9+GMTExpUuXlrfS6XTr1q2zYA6rVq0SJlCmTJnY2FgLupLTJIzWqlVLPuIXX3yhptXbt2+Vz05cunTJdKthw4bJ6y9btkzNWGfPnhUG6t69u+kmderUkdf/97//rWYgg8HQr18/Yazz588bq7xx40Z5zaNHj6ocBQAAGFMETmDy8vLas2ePnZ2dvHDWrFl37twx3TDn1rO85J///Ofw4cMtmMPo0aNnzZolL3n16tU333xjQVfaCg8Pv3XrVu6lvb39woUL1TQsUaLEhAkThMLQ0FATTaKjo+XprWHDhuPGjVMzVtu2bYUHOo8dO/bs2TNj9W/dunXz5s3cS0dHRyEEm6AMoxcuXDBW+Y8//pBfVqtWTeUoAADAmCIQRiVJatu27fz58+Uler0+z7vnufbt23fq1Cl5SfPmzadMmWLxHL7//nvhEcMTJ04cOHDA4g41sWPHDvllt27d5LfRTVM+wvv48WMT9RcsWJCVlZV7GRgYqP44gBEjRsgvs7KyIiMjjVUOCQmRX7Zr165UqVIqB2ratKlQ8vTpU2OV//vf/8ovq1atqnIUAABgTNEIo5IkjRs3ztPTU16yf/9++XqYYPbs2fJLOzu7NWvWFOQ8Jxsbm7Vr1wonAwnLpYXfpUuX5Jc9evRQ37ZKlSpCSVJSkrHKKSkpO3fuzL10dnbu27ev+rE6d+4sJNcbN24Yq/z777/LL1u3bq1+IOVWTc+fPzdWWb4yWqFCBScnJ/UDAQCAPBWZs+nt7OzmzJkzcODA3BKDwbB+/frFixcrK4eFhV25ckVe4u/vr/7IR2O8vLyGDh26YcOG3JLIyMhz5861atWqgD2/HwaD4fr16/ISs76T7OxsoaRcuXLGKu/du/fNmze5l927dzdrn1E3N7e5c+fKz8w0ttuXJEnR0dHyS+GhWNOExz8kSXJ0dDRWWR5GWRYFAMAqikwYlSSpT58+zs7OycnJuSXbt2/PM4z+9NNPQollj4oqjRgxQh5GJUnasGFDUQmjaWlpvXr1kpfUrl1bffMnT54IJTVq1DBW+eDBg/LLdu3aqR8oh/pnKoSnh5VbqJqQmJgolLi6uhqrLL9NzwOjAABYRVEKo3Z2dr6+vuvXr88tefLkSVRUVL169eTVDAaDkITq1q2rfDTQMi1atKhTp4788YCDBw8aDAb1T0NqqHTp0lu2bLG4ufJ1pTZt2uRZ02AwCA/sWuUUTWNyjmnNvRQepTBNWEGXJEn4dcqVkpLy6tWr3EvCKAAAVlFknhnN0bNnT6EkLCxMKImMjBSWu/r372/FOQjvXycmJioDTbG0efNm+aWXl1fDhg3zrBkdHf3y5cvcSxsbG/lNdr1ev23bNn9//zp16ri6utrb23t4eNSvX79Hjx6LFy+Oiooyd2K2trYlZMxqe+jQIaGkefPmedYU3l4ijAIAYBVFaWVUkiRl+hEegpQkKTw8XChRHrRTEMreLl682KhRIysOUQjt2LHjl19+kZfMmDHDWGXhNSkPD4+cBzGzs7OXL18+b968+Ph4eYX4+Pj4+PioqKjDhw//4x//aNas2dy5czt06GDVT5CHFy9eCNsLNG/e3NjDoMb2dTIYDGFhYXv37o2IiIiJiUlOTrazs3Nzc3N1da1Tp46Pj4+Pj0+eR6oCAACpyIXR6tWrly1bVr7qJt81M8fVq1eFkncdRov9ymhoaKi/v7+8ZMCAASbejr99+7b8Mmf3qJSUlL59+yo3tFe6ePGij4/PgAEDNm7cqDx/y4oWLFjw4sULeYmJZ4vzXBk9cOBAYGCgsKtDRkZGWlraw4cPIyMjt2zZotPpfH19Z86caewBAAAAPmRF7Da9TqcTzopUbnUpHCDu4eHh4eFhxTlUqlRJ2A8oNjbWiv0XKnq9fs6cOZ06dZK/Gt+yZUvhLCKB8IU4OztLkhQQEKAmiebatWtX27ZthTVUK7p69eqiRYvkJZ6enl9//bWx+sqV0W3btvXt29fE/mI5DAbD7t27GzRokHOWfQGmDABAMVTEwqgkSWXLlpVfKt+GfvTokfxSuZFkwbm7u5sYsahLT09//PjxsWPHpkyZUrVq1e+///7t27e5/zpkyJCTJ0+aXrAUvpCyZcueP39+7dq1OZcfffTRtGnTLly4EB8fr9fr4+LiLl68OGvWLOWWTBEREZ9//rl8dGtJS0vz8/MTel6yZImJR07lYbRUqVK//vrrV199pdzuyhiDwTBv3ryBAwfq9XrL5gwAQLFUxG7TS4owKl+xyyGcG2liL0yLCX2aOKmyyDG2LYBOp2vbtu306dPVPMqp/Ath1KhROYuC48aNmzNnTpkyZXL/qVKlSpUqVWratOnUqVOXLl0aGBiYmZmZ+68XL16cNGnS0qVLLfgsJowYMUJY0Rw5cqTpIwDkt+kNBsPAgQNz5+nj4/Pll1+2aNGicuXKJUqUSEhIiI6OPnTo0MaNG+Uv4EuSFBwc7OLisnr1aut9FAAAirh3efC9eEfSz8+v4H0OHjxY3qeNjY1QwcHBQV6hV69eBR9UILzUX7JkScv68fPze58/DjWM/Z7UqlVr9erVKSkpajpxc3OTt839iSxZsiTfttu3b1celHX16tWCfjAZ5blZ9erVS01NNd2qevXqyq+lWrVqZ86cMdbk6dOnee7ksHXrVit+HAAAirSid5s+LS1Nfqk81ycjI0N+qf6YcvWEPj+EG6+3bt0aPXr0J598Mn/+/Hzvm79+/Vp+mfP9DB8+fOLEifkONHjw4PHjxwuF8+bNM2+6xm3btm3mzJnyEmdn53379pn+PcnOzo6LixMK69evf+nSJRP7+VesWHHnzp2jRo0Syv/+97+np6ebNW0AAIqrohdGhfueyocXhXgqhFerSE1NlV8Ka7HFWHJycmBgYJs2bUw/Jiv8PSBJkpub27Jly1SOMmvWrAoVKshLgoODlW+qWeDYsWNff/214f/vkL9jxw7hrTilp0+fChHc3d392LFjwhqwkk6nW7FiRePGjYXe/vOf/5g5dwAAiqeiF0bl+zpJineJJEU8FfbusQqhz3e6/dB7ZjAY9Hp9YmJidHT0zp07J02apNx3Mzw8vH379srTQXNlZWUJJSNHjlS/RF22bNkhQ4YIHZ4+fVplc2PCw8P79esnZMq1a9d26tQp37bCq/SSJK1ateqjjz5SM66dnd3KlSuVzdW0BQCg2Ct6YVRYk6tcubJQQViseg9hNN/lsaLF3t7ezc2tVq1aAwYMCAoKevDgwfbt23P2Cs0VExMzaNAgY++SK99J/+tf/2rWHJRP05q1LZTS9evXu3fvLiyTz54928ReTnLJycnVZPr06WNim1Wlpk2bCgc73bhxozi99wYAgMWKWBiNj49PSEiQlyj3A6pSpYrQ5F1Mw8SIxYxOpxs8eHBERMSf/vQneXlYWFjubk0C4UmJMmXK1K1b16xBGzRoIKw3X7t2zawe5O7evdu5c+fk5GR54YQJE6ZPn66yh27duj2Q2bt3r7lz+Pzzz+WXBoMhNDTU3E4AACh+ilgYVR7+2aBBA6HE09NTfvn06VMTN5QtEBcXJwTimjVrWrH/wqlSpUr79u0TljwXL15syOsFfGHrq7p16ypfkDetRIkSQn61eB3xjz/+8PHxEf5+GDZs2JIlSyzr0DItWrQQSoTTGQAA+DAVsTB67tw5oaR169ZCiZeXl1AiHJVeQMrevL29rdh/oVW7dm3hUc67d+9GRkYqa7q6usovc05gMpfQiWVhND4+vmPHjsJJnoMGDVq7dq2xHVXfEeU7Us+fP3+fEwAAoHAqYmF0165d8svKlSvXqVNHqCM8nCdJUkREhBXnoAyjzZo1s2L/hZmvr69QovzzQFI8tyCcU6CSsLxqwV5IycnJnTp1unv3rrzQ19d3y5Yt5q7UFpwykRNGAQCQitYJTFFRUcKpOYMGDVJW8/b2dnd3l99JDw4Onj17trWmIQTiihUrKtdiC6GbN28mJSXlXtaoUUN4J0mNhg0bCiUPHz5UVqtRo4b80rLdtYSztczdLzY1NbVr1643btyQF/bs2fPnn382cebnu2NnZyeUvP9ADABAIVSUwuiiRYuEkjxfhdbpdL179163bl1uSXR09IULF5QP7Vng3Llzt2/flpf07t37Pd/wtcyCBQs2bdqUezl16tQ5c+aY24lyIy3hraAcwuOeli0BCq3Mis7p6em9evX67bff5IVdunQJDg5WhsJ8GQyGnTt3yp+O7d69u7nLvcovoXz58ubOBACA4qfIhNHr169v3rxZXtK1a9f69evnWdnf318eRiVJWr9+vVXCqPL9cX9//4J3+x7Url1bfvn7779b0ImwWinldQKWJElNmjSRX0ZFRWVlZdna2qofyGAwREdHy0uEd/lNePv2bf/+/YWtoDp06LBv3z7LjifQ6XRjxoyRp8m9e/f26dPHrE6UBzh98sknFkwGAIBipmjcKMzMzBw3bpx8V0udTmfiznvLli2FM282btxYkL2Bcly+fHnLli3ykiZNmlgl474Hwmrl5cuX83wR3jTlvgR5Llh6eXnJn/h89erVlStXzBooKipKWHNVPgqcp+zs7CFDhoSEhMgL27Rpc/DgQUdHR7PmIFevXj35pQU78J8/f14oEX5FAQD4MBWNMDpx4sRffvlFXjJixAhh+U3www8/yC8zMzNHjhxpbJN2NbKyskaNGiWcLSSMUpg1btxY/jjBo0ePlPEoX8qtMfN8XrZEiRKdO3eWl5h7+qX8iYIcvXr1yreVwWAYNWrUjh075IUtWrQICQlxcnIyawICIYzu27dPecqUaUI+dnZ2btSoUUGmBABAMWF4l4Sx/Pz8LOhE+WhjzZo1X758mW9DIQ9JkvTjjz9aMIEcM2bMEHrr2rWrxb3lUJ4zVMAOTWvZsqV8LF9fX3N7aNWqlbwHR0dHYz+I/fv3y2uWLl366dOnKkd5/vy58Cp948aN1TScOHGi8H02adLkxYsXaj+eccpd7oODg9U3F96jkiRp9OjRBZ8VAADFQKEOo2lpaV988YXQSdmyZa9du6am+b1798qUKSNvq9Pp1qxZY8EHUZ4tXrZs2fv371vQldx7DqPLli0Thjtw4ID65jt37hSa+/v7G6ucmZlZrVo1eeXevXurHKhfv37CQDnvD5mm/GvB29s7KSlJ7cczKT09XXjfqEaNGq9fv1bT9u3bt0KIt7W1vXPnjlUmBgBAUVdIw6her1+xYoXyeUQnJ6dTp06pn8Du3bslhcDAwLdv36rsISMjY/LkyUIPOp1uz5496qdhzHsOoy9fvvTw8BC+z9DQUDVtL168KGyu5OTk9PDhQxNNlC97TZs2Ld+Bpk2bJrRq06ZNvq0WL14stKpfv/6zZ8/UfDSVxo8fLwzRv3//rKws061ynu4QGn733XdWnBgAAEVaoQijmZmZqampcXFxERERa9euHTBgQJ5n9jg7O4eFhZk7B+WGUJIkNWzY8MiRI6YbZmdnHz58WHncqCRJixYtMncaeXrPYdRgMAibDEiSZGdn98MPP5hY5MvMzFyxYoXy7Z9169aZHisrK0v5dtfIkSON3TdPTEwUTnjK+aE/ePDA9EBr1qwRWtWuXTs+Pj7fb8MsSUlJbm5uwkBdu3Y18fjBw4cPe/ToITTx9vZWuaQKAMCH4L2G0YJo1qxZvqHEmEWLFuW5wbinp2dAQEBISEhsbGxqampWVlZqampsbGxISEhAQECeJ87b2NhYK4katAijWVlZAwYMUH4uFxeXCRMm7N+//+HDh6mpqXq9/smTJ6GhobNmzapevbqy/owZM9QMFxsbK5zqKUmSh4dHYGBgeHh4QkKCXq+Pi4s7ffr0xIkTlftuOjo65rtwu337duvuHm9i/f7nn39W7inr5OT0zTffHDp0KC4uLj09PS0t7f79+7t37x42bJhyJylPT89Hjx6Z9zMDAKBYKwJhtEKFCsuXL8/3fqhpBw8edHFxKeBMXF1dDx48aK0vx6BFGDUYDOnp6R06dLD4SyhZsuSqVavUD3fhwgXLzqYvV67c2bNn8+3f6scpmX6YZPny5Rb37OPjo/4tLgAAPhCFemunRo0aLV++/MGDB2PHji3g6lfPnj1v3br11VdfmbX1ei5bW9uhQ4dGR0f37NmzINMoDBwcHI4ePTp16lQLvor27dtfv3599OjR6ps0b9783Llzxo4nMNHq8uXLbdu2zbdmZmamWT0X0NixY3fv3q08ico0Ozu7H3/88fjx4xUrVnxHEwMAoIjSGax6M13sXd05mba2tg4ODqVLl3ZxcalSpUqtWrUaNWrk4+NTtWpVq0/p7t27y5Yt27Fjx7Nnz9TUd3NzGzhw4MSJEz09Pa0+mT179ly/fl1eMnPmTKuPYszly5f/9a9/BQcHZ2RkmK5pY2PTrVu3MWPGdOvWzbKxMjIyVq5cuXDhwsePH5uuWatWrSlTpgwdOlTlL4/Vz2L18/MTjjZQevbsWVBQ0E8//ZSYmGi6pqOj4/DhwwMCAj7++GPrzREAgOLj3YbRQiszM/PcuXNhYWFXrlyJjY19/PhxzoOSOZm4UqVKn376qbe3d+vWrVu1amX1G8GFSkJCwokTJ8LDwy9duhQfH5+SkvLq1SsnJycXFxd3d3dvb+9WrVq1b9++SpUqBR8rKyvr5MmTJ06cuHTpUmxsbFJSUnp6uoODg7u7u6enZ/PmzXv06KHypKXCICMj4/jx4+Hh4REREffv309JSXnx4oWdnV2FChXc3d0bN27csWPHDh06cAY9AAAmfKBhFAAAAIVBoX5mFAAAAMUbYRQAAACaIYwCAABAM4RRAAAAaIYwCgAAAM0QRgEAAKAZwigAAAA0QxgFAACAZgijAAAA0AxhFAAAAJohjAIAAEAzhFEAAABohjAKAAAAzRBGAQAAoBnCKAAAADRDGAUAAIBmCKMAAADQDGEUAAAAmiGMAgAAQDOEUQAAAGiGMAoAAADNEEYBAACgGcIoAAAANEMYBQAAgGYIowAAANAMYRQAAACaIYwCAABAM4RRAAAAaIYwCgAAAM0QRgEAAKAZwigAAAA0QxgFAACAZgijAAAA0AxhFAAAAJohjAIAAEAzhFEAAABohjAKAAAAzRBGAQAAoBnCKAAAADRDGAUAAIBmCKMAAADQDGEUAAAAmiGMAgAAQDOEUQAAAGiGMAoAAADNEEYBAACgGcIoAAAANEMYBQAAgGYIowAAANAMYRQAAACaIYwCAABAM4RRAAAAaIYwCgAAAM0QRgEAAKAZwigAAAA0QxgFAACAZgijAAAA0AxhFAAAAJohjAIAAEAzhFEAAABohjAKAAAAzRBGAQAAoBnCKAAAADRDGAUAAIBmCKMAAADQDGEUAAAAmiGMAgAAQDOEUQAAAGiGMAoAAADN/B+D+96hQ/t0YgAAAABJRU5ErkJggg==\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "if (pm.response.code === 200) {",
+              "  const resultado = pm.response.json();",
+              "  pm.test(\"Motor PaddleOCR\", function () { pm.expect(resultado.motor).to.eql(\"PADDLEOCR\"); });",
+              "  pm.test(\"Resposta contém linhas e duração\", function () {",
+              "    pm.expect(resultado.linhas).to.be.an(\"array\");",
+              "    pm.expect(resultado.duracaoMs).to.be.a(\"number\");",
+              "    pm.expect(resultado.duracaoMs).to.be.at.least(0);",
+              "    resultado.linhas.forEach(function (linha) {",
+              "      pm.expect(linha.texto).to.be.a(\"string\");",
+              "      pm.expect(linha.escore).to.be.a(\"number\");",
+              "      pm.expect(linha.regiao).to.be.an(\"array\");",
+              "    });",
+              "  });",
+              "}",
+              "if (pm.response.code === 200) pm.test(\"Exemplo produziu texto\", function () { pm.expect(pm.response.json().linhas.length).to.be.above(0); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 — Reconhecer minha foto",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{ocr_base_url}}/v1/reconhecer",
+        "description": "Execute python3 preparar_foto.py \"/caminho/foto.jpg\" --campo DOT. Em Body > binary > Select File, selecione o JSON gerado, não o JPEG original. O arquivo contém campo e foto_base64; o Content-Type permanece application/json. Clique Send novamente para reenviar a mesma foto.",
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": null
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "if (pm.response.code === 200) {",
+              "  const resultado = pm.response.json();",
+              "  pm.test(\"Motor PaddleOCR\", function () { pm.expect(resultado.motor).to.eql(\"PADDLEOCR\"); });",
+              "  pm.test(\"Resposta contém linhas e duração\", function () {",
+              "    pm.expect(resultado.linhas).to.be.an(\"array\");",
+              "    pm.expect(resultado.duracaoMs).to.be.a(\"number\");",
+              "    pm.expect(resultado.duracaoMs).to.be.at.least(0);",
+              "    resultado.linhas.forEach(function (linha) {",
+              "      pm.expect(linha.texto).to.be.a(\"string\");",
+              "      pm.expect(linha.escore).to.be.a(\"number\");",
+              "      pm.expect(linha.regiao).to.be.an(\"array\");",
+              "    });",
+              "  });",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 — Conferir bloqueio sem token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{ocr_base_url}}/v1/reconhecer",
+        "description": "Teste negativo: HTTP 403 é o resultado esperado. Nenhuma foto é enviada.",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", function () { pm.response.to.have.status(403); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
