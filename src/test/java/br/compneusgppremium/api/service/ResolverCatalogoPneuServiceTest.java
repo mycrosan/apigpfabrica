@@ -380,6 +380,29 @@ class ResolverCatalogoPneuServiceTest {
                 catalogo, 25)).isEmpty();
     }
 
+    // Leitura real da fábrica: o marcador saiu com dois erros ("MADGAN") e o país com um
+    // ("CHENA"). Somados dão três e estouram a tolerância; separados, o país casa com folga.
+    @Test
+    void paisCasaMesmoComOMarcadorCorrompido() {
+        when(paises.findAll()).thenReturn(
+                List.of(pais(4, "CHINA"), pais(1, "BRASIL"), pais(12, "THAILAND"), pais(32, "CHILE")));
+        var catalogo = resolvedor.snapshot("PAIS", null, null);
+        for (String leitura : List.of("MADGANCHENA", "MADEANCHENA")) {
+            assertThat(resolvedor.resolverAproximado("PAIS", List.of(linha(leitura, 0.85)), catalogo, null))
+                    .as(leitura).extracting("id").containsExactly(4);
+        }
+    }
+
+    // O prefixo precisa parecer o marcador: sem isso, qualquer texto terminado parecido com um
+    // país viraria candidato.
+    @Test
+    void sufixoParecidoComPaisSemMarcadorNaoCasa() {
+        when(paises.findAll()).thenReturn(List.of(pais(4, "CHINA"), pais(32, "CHILE")));
+        var catalogo = resolvedor.snapshot("PAIS", null, null);
+        assertThat(resolvedor.resolverAproximado("PAIS", List.of(linha("POLYESTERCHENA", 0.9)),
+                catalogo, null)).isEmpty();
+    }
+
     @Test
     void paisMuitoDiferenteNaoViraCandidatoAproximado() {
         when(paises.findAll()).thenReturn(List.of(pais(4, "CHINA"), pais(1, "BRASIL")));

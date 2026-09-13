@@ -34,6 +34,10 @@ public class ResolverCatalogoPneuService {
     private static final double PROPORCAO_MAXIMA_APROXIMACAO = 0.25;
     private static final int MAXIMO_APROXIMADOS = 5;
     private static final int TAMANHO_MINIMO_APROXIMACAO = 4;
+    private static final String MARCADOR_COMPACTO = "MADEIN";
+    private static final int TAMANHO_MINIMO_MARCADOR = 4;
+    private static final int TAMANHO_MAXIMO_MARCADOR = 8;
+    private static final int SEM_CORRESPONDENCIA = Integer.MAX_VALUE;
     // Glifos que o OCR não consegue distinguir em relevo na borracha, medidos nas leituras reais:
     // "SUFER2DDG" e "SUPER2000" são o MESMO texto para o reconhecedor -- F/P têm a mesma haste com
     // laço, e 0/D/G/Q o mesmo corpo redondo. Tratar essas trocas como equivalentes não é escolher o
@@ -259,7 +263,8 @@ public class ResolverCatalogoPneuService {
         }
         int menor = distancia(lido, compacto(cadastrado), tolerancia);
         if ("PAIS".equals(campo)) {
-            menor = Math.min(menor, distancia(lido, "MADEIN" + compacto(cadastrado), tolerancia));
+            menor = Math.min(menor, distancia(lido, MARCADOR_COMPACTO + compacto(cadastrado), tolerancia));
+            menor = Math.min(menor, distanciaSeparandoMarcador(lido, compacto(cadastrado)));
         }
         if ("MODELO".equals(campo)) {
             List<String> semMarca = semPrefixo(cadastrado, prefixoMarca);
@@ -275,6 +280,31 @@ public class ResolverCatalogoPneuService {
             saida.append(CLASSES_DE_GLIFO.getOrDefault(caractere, caractere));
         }
         return saida.toString();
+    }
+
+    /**
+     * O flanco grava sempre "MADE IN &lt;PAIS&gt;". Comparar a frase inteira soma os erros do marcador
+     * aos erros do nome e estoura a tolerância; separar as duas partes isola o que importa.
+     *
+     * <p>Medido em foto real: o OCR devolveu {@code MADGANCHENA} — o marcador saiu com dois erros e
+     * o país com um só. Junto dá três e não casa; separado, o país sozinho ({@code CHENA} contra
+     * {@code CHINA}) casa com folga. O prefixo ainda precisa parecer o marcador, senão qualquer
+     * texto que termine parecido com um país viraria candidato.
+     */
+    private int distanciaSeparandoMarcador(final String lido, final String nome) {
+        if (lido.length() <= nome.length() + 2) {
+            return SEM_CORRESPONDENCIA;
+        }
+        String prefixo = lido.substring(0, lido.length() - nome.length());
+        if (prefixo.length() < TAMANHO_MINIMO_MARCADOR || prefixo.length() > TAMANHO_MAXIMO_MARCADOR
+                || distancia(prefixo, MARCADOR_COMPACTO, DISTANCIA_MAXIMA_APROXIMACAO)
+                        > DISTANCIA_MAXIMA_APROXIMACAO) {
+            return SEM_CORRESPONDENCIA;
+        }
+        String sufixo = lido.substring(lido.length() - nome.length());
+        int limite = tolerancia(nome);
+        int distanciaDoNome = distancia(sufixo, nome, limite);
+        return distanciaDoNome <= limite ? distanciaDoNome : SEM_CORRESPONDENCIA;
     }
 
     private int tolerancia(final String lido) {
