@@ -27,6 +27,20 @@ CAMPOS_RELEVO = ('MARCA', 'MODELO', 'MEDIDA', 'PAIS')
 # mobile; é onde o servidor tem o que ganhar.
 CAMPOS_SERVIDOR_ELEGIVEL = ('MARCA', 'MODELO', 'MEDIDA')
 
+PERFIL_ROTACAO = 'rotacao-v1'
+# Medido em fotos reais da carcaça 202605 (13/09/2026): nenhuma das quatro fotos chegou ao motor
+# já com o texto na horizontal -- a rotação varia por foto, não por um padrão fixo do operador.
+# Rotacionar externamente e reenviar cada foto recuperou leitura exata em MEDIDA (0,78 a 180°;
+# 0,97 a 270°) e melhorou o escore em PAIS (lixo -> CHNA 0,89 a 180°). Só que embutir isso como
+# passagem extra (repetir original+cinza+morfológica em cada rotação) mediu 29,6s numa única
+# chamada de PAIS -- quase 3x o teto de 10s p95 da spec e acima do timeout de 15s configurado.
+# DESLIGADO por padrão por causa desse custo; ligar só depois de uma estratégia mais barata que
+# não multiplique a pilha inteira de passagens por 4. Também não ajuda MEDIDA quando
+# OCR_RECONHECEDOR_RELEVO=servidor está ativo: esse caminho retorna antes de chegar aqui (ver
+# `reconhecer`), então MEDIDA continua sem correção de rotação no ambiente em que essa medição
+# foi feita.
+CAMPOS_ROTACAO = ('MEDIDA', 'PAIS')
+
 PERFIL_MORFOLOGICO = 'morfologico-v1'
 # Ainda mais frouxo que PARAMETROS_RELEVO: alfabeto grande em relevo vazado (marca/modelo) ocupa
 # muito mais área do quadro que o DOT, então precisa de um lado de entrada maior para o detector
@@ -72,6 +86,9 @@ class MotorLocal:
         self.perfil_morfologico = os.getenv('OCR_PERFIL_MORFOLOGICO', PERFIL_MORFOLOGICO)
         if self.perfil_morfologico not in ('legado', PERFIL_MORFOLOGICO):
             raise ValueError('Perfil morfológico desconhecido')
+        self.perfil_rotacao = os.getenv('OCR_PERFIL_ROTACAO', 'legado')
+        if self.perfil_rotacao not in ('legado', PERFIL_ROTACAO):
+            raise ValueError('Perfil de rotação desconhecido')
         self.reconhecedor_relevo = os.getenv('OCR_RECONHECEDOR_RELEVO', RECONHECEDOR_MOBILE)
         if self.reconhecedor_relevo not in (RECONHECEDOR_MOBILE, RECONHECEDOR_SERVIDOR):
             raise ValueError('Reconhecedor de relevo desconhecido')
@@ -116,7 +133,7 @@ class MotorLocal:
 
         perfis = {nome: valor for nome, valor in
                   (('DOT', self.perfil_dot), ('RELEVO', self.perfil_relevo),
-                   ('MORFOLOGICO', self.perfil_morfologico),
+                   ('MORFOLOGICO', self.perfil_morfologico), ('ROTACAO', self.perfil_rotacao),
                    ('RECONHECEDOR_RELEVO', self.reconhecedor_relevo)) if valor not in ('legado', RECONHECEDOR_MOBILE)}
         if perfis:
             perfil = json.dumps({'perfis': perfis, 'parametros_relevo': PARAMETROS_RELEVO,
@@ -154,6 +171,8 @@ class MotorLocal:
             rotulo = 'exif-transpose-rgb-' + self.perfil_relevo
             if self.perfil_morfologico != 'legado':
                 rotulo += '+' + self.perfil_morfologico
+            if campo in CAMPOS_ROTACAO and self.perfil_rotacao != 'legado':
+                rotulo += '+' + self.perfil_rotacao
             return rotulo
         return 'exif-transpose-rgb-v1'
 
@@ -169,19 +188,30 @@ class MotorLocal:
             # PAIS, que já funciona bem no mobile.
             if campo in CAMPOS_SERVIDOR_ELEGIVEL and self.reconhecedor_relevo == RECONHECEDOR_SERVIDOR:
                 return self._extrair_com(self._modelo_relevo, self._reduzir(bgr), **PARAMETROS_SERVIDOR)
-            linhas = self._extrair(bgr)
-            if self._usa_relevo(campo):
+            linhas = self._passagens(bgr, campo)
+            if self._usa_rotacao(campo):
                 import cv2
-                g = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
-                cinza = cv2.cvtColor(g, cv2.COLOR_GRAY2BGR)
-                # Acrescenta; não substitui resultados nem monta valores a partir de caracteres
-                # isolados. O Paddle devolve as regiões na escala de entrada, preservada na conversão.
-                linhas.extend(self._extrair(cinza, **PARAMETROS_RELEVO))
-                if self._usa_morfologico(campo):
-                    linhas.extend(self._extrair(self._realce_relevo(g), **PARAMETROS_MORFOLOGICO))
+                # A foto chega ao motor na orientação em que o operador segurou o telefone, não
+                # necessariamente com o texto na horizontal. Repete a mesma pilha de passagens em
+                # cada rotação; não decide entre as leituras, só acrescenta candidatos.
+                for rotacao in (cv2.ROTATE_90_CLOCKWISE, cv2.ROTATE_180, cv2.ROTATE_90_COUNTERCLOCKWISE):
+                    linhas.extend(self._passagens(cv2.rotate(bgr, rotacao), campo))
             return linhas
         finally:
             self._lock.release()
+
+    def _passagens(self, bgr, campo):
+        linhas = self._extrair(bgr)
+        if self._usa_relevo(campo):
+            import cv2
+            g = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
+            cinza = cv2.cvtColor(g, cv2.COLOR_GRAY2BGR)
+            # Acrescenta; não substitui resultados nem monta valores a partir de caracteres
+            # isolados. O Paddle devolve as regiões na escala de entrada, preservada na conversão.
+            linhas.extend(self._extrair(cinza, **PARAMETROS_RELEVO))
+            if self._usa_morfologico(campo):
+                linhas.extend(self._extrair(self._realce_relevo(g), **PARAMETROS_MORFOLOGICO))
+        return linhas
 
     # Reduz ANTES de entregar ao Paddle: o parâmetro text_det_limit_side_len por si só não
     # evita o pico de memória de decodificar e it copiar uma imagem de câmera em resolução
@@ -200,6 +230,9 @@ class MotorLocal:
         if campo == 'DOT':
             return self.perfil_dot != 'legado'
         return campo in CAMPOS_RELEVO and self.perfil_relevo != 'legado'
+
+    def _usa_rotacao(self, campo):
+        return campo in CAMPOS_ROTACAO and self.perfil_rotacao != 'legado'
 
     # Só para os campos de alfabeto grande vazado (não o DOT, que já tem sua própria passagem
     # ajustada e comprovada em produção): letra em relevo iluminada de lado forma uma borda clara

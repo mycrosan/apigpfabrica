@@ -6,15 +6,17 @@ from unittest import TestCase
 from PIL import Image
 
 from pneus_ocr.engine import (MotorLocal, PERFIL_DOT, PERFIL_RELEVO, PERFIL_MORFOLOGICO,
-                               RECONHECEDOR_MOBILE, RECONHECEDOR_SERVIDOR, LADO_MAXIMO_SERVIDOR)
+                               PERFIL_ROTACAO, RECONHECEDOR_MOBILE, RECONHECEDOR_SERVIDOR,
+                               LADO_MAXIMO_SERVIDOR)
 
 
 def motor_teste(perfil=PERFIL_DOT, perfil_relevo=PERFIL_RELEVO, perfil_morfologico=PERFIL_MORFOLOGICO,
-                 reconhecedor_relevo=RECONHECEDOR_MOBILE):
+                 perfil_rotacao='legado', reconhecedor_relevo=RECONHECEDOR_MOBILE):
     motor = MotorLocal.__new__(MotorLocal)
     motor.perfil_dot = perfil
     motor.perfil_relevo = perfil_relevo
     motor.perfil_morfologico = perfil_morfologico
+    motor.perfil_rotacao = perfil_rotacao
     motor.reconhecedor_relevo = reconhecedor_relevo
     motor._lock = Lock()
     motor._modelo = Mock()
@@ -45,7 +47,8 @@ class TestMotorLocal(TestCase):
 
     def test_campos_em_relevo_ganham_tres_passagens_original_cinza_e_morfologica(self):
         # Foto real de medida: sem a passagem morfologica o detector so achava um fragmento
-        # ('70R'); com ela, a linha inteira ('175/70R14C').
+        # ('70R'); com ela, a linha inteira ('175/70R14C'). Rotacao fica fora por padrao (ver
+        # CAMPOS_ROTACAO em engine.py), entao MEDIDA/PAIS se comportam igual a MARCA/MODELO aqui.
         for campo in ('MARCA', 'MODELO', 'MEDIDA', 'PAIS'):
             motor = motor_teste()
             motor._modelo.predict.side_effect = [
@@ -54,6 +57,20 @@ class TestMotorLocal(TestCase):
             assert [linha['texto'] for linha in linhas] == ['X', 'MADEINCHINA', '175/70R14C']
             assert motor._modelo.predict.call_count == 3
             assert motor.preprocessamento(campo) == 'exif-transpose-rgb-relevo-v1+morfologico-v1'
+
+    def test_rotacao_e_opt_in_e_repete_as_tres_passagens_em_cada_angulo(self):
+        # Foto real da carcaça 202605 (13/09/2026): nenhuma das quatro fotos chegou ao motor ja
+        # com o texto na horizontal. Rotacionar recuperou leitura exata em MEDIDA (0,78 a 180°) e
+        # melhorou o escore em PAIS (0,89 a 180°) -- mas uma chamada real com isso ligado mediu
+        # 29,6s, quase 3x o teto de 10s p95 da spec. Por isso fica desligado por padrao (teste
+        # acima) e só liga explicitamente aqui, documentando o custo: 4x a pilha de passagens.
+        for campo in ('MEDIDA', 'PAIS'):
+            motor = motor_teste(perfil_rotacao=PERFIL_ROTACAO)
+            motor._modelo.predict.side_effect = [resultado(str(indice)) for indice in range(12)]
+            linhas = motor.reconhecer(Image.new('RGB', (30, 20)), campo)
+            assert len(linhas) == 12
+            assert motor._modelo.predict.call_count == 12
+            assert motor.preprocessamento(campo) == 'exif-transpose-rgb-relevo-v1+morfologico-v1+rotacao-v1'
 
     def test_passagem_morfologica_nao_afeta_o_dot(self):
         # O DOT ja esta em producao com sua propria passagem ajustada; a passagem morfologica
