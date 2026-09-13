@@ -63,8 +63,10 @@ def criar_app(fabrica_motor=MotorLocal):
         aplicacao.state.motor = None
         if os.getenv('OCR_TOKEN'):
             try:
+                diretorio_relevo = os.getenv('OCR_MODELOS_RELEVO_DIR')
                 aplicacao.state.motor = await run_in_threadpool(
-                    fabrica_motor, Path(os.getenv('OCR_MODELS_DIR', '/models'))
+                    fabrica_motor, Path(os.getenv('OCR_MODELS_DIR', '/models')),
+                    Path(diretorio_relevo) if diretorio_relevo else None,
                 )
             except Exception as erro:
                 LOGGER.error('OCR indisponível ao carregar pesos: %s', type(erro).__name__)

@@ -1,0 +1,27 @@
+{
+  "versao": "pais-sinonimos-v1",
+  "comentario": "Leitura completa -> item completo do catalogo. Nenhuma chave pode ser parcial (BRAZ nao vira BRAZIL) nem prefixo de outra chave; ha teste que falha se isso acontecer. O catalogo de pais ja esta quase todo em ingles, entao a lista e curta de proposito.",
+  "sinonimos": {
+    "BRAZIL": ["BRASIL"],
+    "INDUSTRIA BRASILEIRA": ["BRASIL"],
+    "PRODUTO BRASILEIRO": ["BRASIL"],
+    "JAPAN": ["JAPAO"],
+    "COLOMBIA": ["COLONBIA"],
+    "UNITED STATES": ["USA"],
+    "UNITED STATES OF AMERICA": ["USA"],
+    "PRC": ["CHINA"],
+    "SOUTH KOREA": ["KOREA"],
+    "REPUBLIC OF KOREA": ["KOREA"],
+    "DEUTSCHLAND": ["GERMANY"],
+    "ESPANA": ["SPAIN"],
+    "ITALIA": ["ITALY"],
+    "POLSKA": ["POLAND"],
+    "TURKIYE": ["TURKEY"],
+    "VIET NAM": ["VIETNAM"],
+    "CZECHIA": ["CZECH REPUBLIC"],
+    "PHILIPPINES": ["THE PHILIPPINES"],
+    "UK": ["THE UNITED KINGDOM", "GREAT BRITAIN"],
+    "UNITED KINGDOM": ["THE UNITED KINGDOM", "GREAT BRITAIN"],
+    "ENGLAND": ["THE UNITED KINGDOM", "GREAT BRITAIN"]
+  }
+}

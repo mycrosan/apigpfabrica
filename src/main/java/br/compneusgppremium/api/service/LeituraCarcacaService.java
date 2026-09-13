@@ -1,5 +1,6 @@
 package br.compneusgppremium.api.service;
 import br.compneusgppremium.api.config.OcrLocalProperties;
+import br.compneusgppremium.api.controller.dto.CandidatoLeituraDTO;
 import br.compneusgppremium.api.controller.dto.LeituraCampoDTO;
 import br.compneusgppremium.api.controller.dto.ResultadoLeituraDTO;
 import br.compneusgppremium.api.exception.CadastroPneuException;
@@ -42,7 +43,7 @@ public class LeituraCarcacaService {
         byte[] bytes = imagens.validar(foto);
         OcrResposta leitura = extrair(campo, bytes, snapshot);
         try {
-            var resultado = decidir(campo, leitura, snapshot);
+            var resultado = decidir(campo, leitura, snapshot, marcaId);
             log.info("leitura decisao id={} campo={} estado={} motivos={} candidatos={} campoAprovado={} escoreMinimo={} politica={}",
                     MDC.get("leituraId"), campo, resultado.estado(), resultado.motivos(), resultado.candidatos().size(),
                     configuracao.camposAprovados().contains(campo.name()), configuracao.escoreMinimo(), POLITICA);
@@ -62,9 +63,9 @@ public class LeituraCarcacaService {
         }
     }
     private ResultadoLeituraDTO decidir(final Campo campo, final OcrResposta leitura,
-            final Map<Integer, String> snapshot) {
+            final Map<Integer, String> snapshot, final Integer marcaId) {
         String texto = transcrever(leitura);
-        var candidatos = catalogo.resolverSnapshot(campo.name(), leitura.linhas(), snapshot);
+        var candidatos = catalogo.resolverSnapshot(campo.name(), leitura.linhas(), snapshot, marcaId);
         String estado = "AMBIGUA";
         String motivo = "MULTIPLOS_CANDIDATOS";
         String mensagem = "Não consegui distinguir o campo. Tire outra foto ou informe manualmente.";
@@ -121,11 +122,24 @@ public class LeituraCarcacaService {
     }
     public LeituraCampoDTO lerCampo(final Campo campo, final String foto, final Integer marcaId,
             final Integer modeloId) {
-        ResultadoLeituraDTO resultado = analisar(campo, foto, marcaId, modeloId);
+        ExecucaoLeituraDTO evidencia = analisarComEvidencia(campo, foto, marcaId, modeloId);
+        ResultadoLeituraDTO resultado = evidencia.resultado();
         LeituraCampoDTO legado = new LeituraCampoDTO();
         legado.setTexto(resultado.textoOriginal());
         legado.setConfianca("BAIXA");
         legado.setMensagem(mensagemLegada(resultado));
+        legado.setEstado(resultado.estado());
+        // Os candidatos vão para a tela mesmo sem o campo estar aprovado: mostrá-los é oferecer opção
+        // ao operador, não sugerir valor. Só o bloco de SUGESTAO abaixo preenche id/dot.
+        legado.setCandidatos(resultado.candidatos().stream()
+                .map(item -> new CandidatoLeituraDTO(item.id(), item.texto(), item.escore())).toList());
+        // Só quando nada bateu exatamente. Vai numa lista à parte e NÃO passa por decidir(): um item
+        // aproximado jamais pode virar SUGESTAO, senão o sistema estaria escolhendo o mais parecido.
+        if (resultado.candidatos().isEmpty() && evidencia.extracao() != null) {
+            legado.setCandidatosAproximados(catalogo.resolverAproximado(campo.name(),
+                            evidencia.extracao().linhas(), evidencia.catalogo(), marcaId).stream()
+                    .map(item -> new CandidatoLeituraDTO(item.id(), item.texto(), item.escore())).toList());
+        }
         // Só o estado SUGESTAO devolve valor: campo aprovado em configuração e escore acima do mínimo.
         // A tela preenche o campo com esse valor, mas a etapa só fecha com confirmação do operador —
         // ambiguidade e leitura fraca continuam sem preenchimento, como exige a política de decisão.
@@ -138,17 +152,26 @@ public class LeituraCarcacaService {
                 legado.setId(resultado.itemSugeridoId());
             }
         }
+        legado.setMensagem(mensagemComAproximados(legado));
         return legado;
     }
 
     private String mensagemLegada(final ResultadoLeituraDTO resultado) {
-        if (resultado.motivos().contains("MODELO_NAO_APROVADO")) {
-            return "A foto foi processada, mas as sugestões deste campo ainda não estão liberadas. "
-                    + "Confira a foto e informe o valor manualmente.";
-        }
         if ("SUGESTAO".equals(resultado.estado())) {
             return "Leitura automática. Confira a foto e confirme o valor.";
         }
+        // Vale também para campo ainda não aprovado: existe item compatível com o que foi lido, e
+        // escolher é ação do operador. O motivo MODELO_NAO_APROVADO segue nos motivos, para auditoria.
+        if (!resultado.candidatos().isEmpty()) {
+            return "Não deu para confirmar sozinho. Escolha se algum destes for o que está na foto.";
+        }
         return resultado.mensagem();
+    }
+
+    private String mensagemComAproximados(final LeituraCampoDTO legado) {
+        if (legado.getCandidatos().isEmpty() && !legado.getCandidatosAproximados().isEmpty()) {
+            return "A leitura saiu parecida, mas não idêntica. Confira na foto se é um destes.";
+        }
+        return legado.getMensagem();
     }
 }

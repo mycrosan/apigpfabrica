@@ -24,8 +24,13 @@ spring:
       base-path: /api
   servlet:
     multipart:
-      max-file-size: 12MB
-      max-request-size: 12MB
+      # O cadastro guiado por fotos tira uma foto por etapa (até 5 campos) e preserva toda
+      # tentativa, inclusive as que falharam na leitura, como evidência — uma sessão real
+      # facilmente ultrapassa 12MB (fotos de câmera ficam na faixa de 3 a 6MB cada). O limite
+      # antigo datava do cadastro sem fotos guiadas e passou a rejeitar upload legítimo com
+      # MaxUploadSizeExceededException assim que o fluxo novo entrou em uso.
+      max-file-size: ${UPLOAD_TAMANHO_MAXIMO_ARQUIVO:15MB}
+      max-request-size: ${UPLOAD_TAMANHO_MAXIMO_REQUISICAO:100MB}
 gppremium:
   jwt:
     secret: ${JWT_SECRET}

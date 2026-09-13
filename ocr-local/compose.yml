@@ -7,9 +7,14 @@ services:
     environment:
       OCR_TOKEN: ${OCR_TOKEN:?Configure um token interno}
       OCR_MODELS_DIR: /models
+      OCR_MODELOS_RELEVO_DIR: /models-relevo
       OCR_PERFIL_DOT: ${OCR_PERFIL_DOT:-dot-relevo-v1}
+      # 'servidor' exige memória confirmada no host (ver comentário de RECONHECEDOR_SERVIDOR
+      # em pneus_ocr/engine.py) -- soh trocar depois de aumentar a memoria do Docker Desktop.
+      OCR_RECONHECEDOR_RELEVO: ${OCR_RECONHECEDOR_RELEVO:-mobile}
     volumes:
       - ./models:/models:ro
+      - ./models-relevo:/models-relevo:ro
     networks: [ocr_interna]
     read_only: true
     tmpfs: [/tmp]
