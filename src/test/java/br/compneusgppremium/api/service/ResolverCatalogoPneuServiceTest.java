@@ -411,15 +411,67 @@ class ResolverCatalogoPneuServiceTest {
                 catalogo, null)).isEmpty();
     }
 
-    // A spec proíbe aproximar dígito: medida e DOT não entram nessa lista em hipótese nenhuma.
+    // DOT não tem item de catálogo pra comparar -- só dígitos soltos validados por calendário.
+    // Continua de fora da aproximação em qualquer cenário.
     @Test
-    void medidaEDotNuncaRecebemAproximacao() {
-        when(medidas.findAll()).thenReturn(List.of(medida(5, "175/70 R14")));
-        var catalogoMedida = resolvedor.snapshot("MEDIDA", null, null);
-        assertThat(resolvedor.resolverAproximado("MEDIDA", List.of(linha("175/70R15", 0.99)),
-                catalogoMedida, null)).isEmpty();
+    void dotNuncaRecebeAproximacao() {
         assertThat(resolvedor.resolverAproximado("DOT", List.of(linha("3924", 0.99)), Map.of(), null))
                 .isEmpty();
+    }
+
+    // Decisão de 13/09/2026: MEDIDA passou a aceitar aproximação (reverte a regra original da spec
+    // -- ver comentário em CAMPOS_APROXIMACAO). O casamento exato continua rejeitando dígito
+    // trocado; só a lista de aproximados, que sempre exige escolha do operador, é que passa a trazer
+    // a medida vizinha como opção.
+    @Test
+    void medidaComUmDigitoTrocadoViraCandidatoAproximado() {
+        when(medidas.findAll()).thenReturn(List.of(medida(5, "175/70 R14")));
+        var catalogo = resolvedor.snapshot("MEDIDA", null, null);
+        assertThat(resolvedor.resolverSnapshot("MEDIDA", List.of(linha("175/70R15", 0.99)), catalogo, null))
+                .as("casamento exato não pode aceitar dígito trocado").isEmpty();
+        assertThat(resolvedor.resolverAproximado("MEDIDA", List.of(linha("175/70R15", 0.99)),
+                catalogo, null)).singleElement()
+                .satisfies(candidato -> assertThat(candidato.id()).isEqualTo(5));
+    }
+
+    // Leituras reais das fotos da fábrica (13/09/2026): o dígito inicial da medida saiu cortado ou
+    // trocado. Sem aproximação nenhum candidato aparecia; com ela, o flanco vizinho aparece pro
+    // operador escolher olhando a foto.
+    @Test
+    void medidaComDigitoInicialCortadoOuTrocadoViraCandidatoAproximado() {
+        when(medidas.findAll()).thenReturn(List.of(medida(5, "175/70 R14")));
+        var catalogo = resolvedor.snapshot("MEDIDA", null, null);
+        for (String leitura : List.of("75/70R14C", "975/70R14G")) {
+            assertThat(resolvedor.resolverAproximado("MEDIDA", List.of(linha(leitura, 0.85)),
+                    catalogo, null)).as(leitura).singleElement()
+                    .satisfies(candidato -> assertThat(candidato.id()).isEqualTo(5));
+        }
+    }
+
+    // Limite do que a aproximação de MEDIDA cobre: leitura degradada demais continua sem candidato.
+    @Test
+    void medidaMuitoDegradadaNaoViraCandidatoAproximado() {
+        when(medidas.findAll()).thenReturn(List.of(medida(5, "175/70 R14")));
+        var catalogo = resolvedor.snapshot("MEDIDA", null, null);
+        assertThat(resolvedor.resolverAproximado("MEDIDA", List.of(linha("#S/70R14G", 0.65)),
+                catalogo, null)).isEmpty();
+    }
+
+    // Leitura real de PAIS (13/09/2026): o marcador e o nome saíram ambos degradados
+    // ("MADEMI CHNA"), e o nome sozinho ("ICHNA") tem distância 2 até "CHINA" -- a fórmula
+    // proporcional ao tamanho dava tolerância 1 pra nomes de 5 letras e não pegava. Motiva a
+    // tolerância cheia pra nomes com mais de 4 letras em distanciaSeparandoMarcador.
+    @Test
+    void paisComNomeDoisCaracteresErradosAposSepararMarcadorViraCandidatoAproximado() {
+        when(paises.findAll()).thenReturn(List.of(pais(4, "CHINA"), pais(1, "BRASIL"), pais(32, "CHILE")));
+        var catalogo = resolvedor.snapshot("PAIS", null, null);
+        assertThat(resolvedor.resolverAproximado("PAIS", List.of(linha("MADEMICHNA", 0.7)),
+                catalogo, null)).singleElement()
+                .satisfies(candidato -> assertThat(candidato.id()).isEqualTo(4));
+        // Mesma foto, marcador ainda mais degradado (primeira letra errada): continua sem candidato
+        // -- o prefixo já não se parece o bastante com "MADE IN" pra contar como o mesmo marcador.
+        assertThat(resolvedor.resolverAproximado("PAIS", List.of(linha("WADEMICHNA", 0.7)),
+                catalogo, null)).isEmpty();
     }
 
     @Test

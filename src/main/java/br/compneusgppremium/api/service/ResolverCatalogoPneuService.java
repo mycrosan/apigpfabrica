@@ -27,9 +27,17 @@ public class ResolverCatalogoPneuService {
     private final PaisRepository paises;
     private final ValidacaoFormatoPneuService formatos;
     private final SinonimosPaisService sinonimosPais;
-    // Campos onde aproximar é aceitável: vocabulário de texto, com item conferível na foto.
-    // MEDIDA e DOT ficam de fora — a spec proíbe aproximar dígito.
-    private static final java.util.Set<String> CAMPOS_APROXIMACAO = java.util.Set.of("MARCA", "MODELO", "PAIS");
+    // Campos onde aproximar é aceitável: item de catálogo conferível na foto, e a lista de
+    // aproximados nunca vira sugestão automática -- quem escolhe é o operador olhando a foto.
+    // MEDIDA entrou aqui em 13/09/2026 por decisão explícita, revertendo a regra original da spec
+    // ("nunca corrigir dígitos por aproximação", SPEC_IA_PNEUS_PRECISAO_E_BASE_REVISADA.md §4.3):
+    // fotos reais mostraram o dígito inicial da medida cortado ou trocado ("175/70R14C" lido como
+    // "75/70R14C" ou "975/70R14G") e sem tolerância nenhum candidato aparecia. O risco aceito é o
+    // mesmo dos outros campos aproximados -- a lista pode trazer uma medida vizinha errada (ex.:
+    // R15 por R14), e cabe ao operador conferir o flanco antes de confirmar. DOT segue de fora:
+    // não há item de catálogo pra comparar, só dígitos soltos validados por calendário.
+    private static final java.util.Set<String> CAMPOS_APROXIMACAO =
+            java.util.Set.of("MARCA", "MODELO", "PAIS", "MEDIDA");
     private static final int DISTANCIA_MAXIMA_APROXIMACAO = 2;
     private static final double PROPORCAO_MAXIMA_APROXIMACAO = 0.25;
     private static final int MAXIMO_APROXIMADOS = 5;
@@ -214,7 +222,8 @@ public class ResolverCatalogoPneuService {
      * distância. MEDIDA e DOT ficam de fora por decisão da spec: dígito não se aproxima.
      *
      * <p>O chamador precisa manter esta lista separada dos candidatos exatos. Um item daqui nunca
-     * pode virar sugestão automática — quem escolhe é o operador, olhando a foto.
+     * pode virar sugestão automática — quem escolhe é o operador, olhando a foto. DOT fica de fora:
+     * não há item de catálogo pra comparar, só dígitos validados por calendário.
      */
     public List<Candidato> resolverAproximado(final String campo, final List<OcrResposta.Linha> linhas,
             final Map<Integer, String> catalogo, final Integer marcaId) {
@@ -302,7 +311,13 @@ public class ResolverCatalogoPneuService {
             return SEM_CORRESPONDENCIA;
         }
         String sufixo = lido.substring(lido.length() - nome.length());
-        int limite = tolerancia(nome);
+        // Nome já isolado do marcador aqui: nomes com mais de 4 letras (CHINA, KOREA, ITALY...)
+        // usam a mesma tolerância máxima do resto do arquivo em vez da fórmula proporcional ao
+        // tamanho, que arredondava pra 1 em nomes curtos e não pegava leitura real medida em foto
+        // (13/09/2026: "MADEMI CHNA"/"WADEMI CHNA" -> nome "ICHNA" tem distância 2 até "CHINA").
+        // Nomes de até 4 letras (USA, UA) continuam na fórmula proporcional: tolerar 2 erros ali
+        // seria aceitar metade do nome trocada.
+        int limite = nome.length() > TAMANHO_MINIMO_APROXIMACAO ? DISTANCIA_MAXIMA_APROXIMACAO : tolerancia(nome);
         int distanciaDoNome = distancia(sufixo, nome, limite);
         return distanciaDoNome <= limite ? distanciaDoNome : SEM_CORRESPONDENCIA;
     }
