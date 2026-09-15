@@ -3,10 +3,8 @@ import base64
 import binascii
 import hmac
 import io
-import json
 import logging
 import os
-import time
 import warnings
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -17,7 +15,7 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from starlette.concurrency import run_in_threadpool
 
-from .engine import MotorLocal
+from .gateway import executar_motor, selecionar_motor
 
 LOGGER = logging.getLogger(__name__)
 LIMITE_BYTES = int(os.getenv('OCR_MAX_BYTES', '8388608'))
@@ -57,21 +55,26 @@ def decodificar(texto: str):
         raise HTTPException(413, 'Imagem acima do limite de pixels') from erro
 
 
-def criar_app(fabrica_motor=MotorLocal):
+def criar_app(fabrica_motor=selecionar_motor):
     @asynccontextmanager
     async def lifespan(aplicacao):
         aplicacao.state.motor = None
         if os.getenv('OCR_TOKEN'):
             try:
                 diretorio_relevo = os.getenv('OCR_MODELOS_RELEVO_DIR')
-                aplicacao.state.motor = await run_in_threadpool(
-                    fabrica_motor, Path(os.getenv('OCR_MODELS_DIR', '/models')),
-                    Path(diretorio_relevo) if diretorio_relevo else None,
-                )
+                argumentos = [Path(os.getenv('OCR_MODELS_DIR', '/models'))]
+                if diretorio_relevo:
+                    argumentos.append(Path(diretorio_relevo))
+                aplicacao.state.motor = await run_in_threadpool(fabrica_motor, *argumentos)
             except Exception as erro:
                 LOGGER.error('OCR indisponível ao carregar pesos: %s', type(erro).__name__)
-        yield
-        aplicacao.state.motor = None
+        try:
+            yield
+        finally:
+            motor = aplicacao.state.motor
+            aplicacao.state.motor = None
+            if motor is not None and hasattr(motor, 'fechar'):
+                await run_in_threadpool(motor.fechar)
 
     aplicacao = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
 
@@ -83,6 +86,12 @@ def criar_app(fabrica_motor=MotorLocal):
     def ready():
         if aplicacao.state.motor is None:
             raise HTTPException(503, 'OCR não provisionado')
+        try:
+            if hasattr(aplicacao.state.motor, 'pronta') and not aplicacao.state.motor.pronta():
+                raise RuntimeError('Motor local não está pronto')
+        except Exception as erro:
+            LOGGER.warning('OCR indisponível na verificação: %s', type(erro).__name__)
+            raise HTTPException(503, 'OCR não provisionado') from erro
         return {'status': 'pronto', 'versaoModelo': aplicacao.state.motor.versao}
 
     @aplicacao.post('/v1/reconhecer')
@@ -103,9 +112,9 @@ def criar_app(fabrica_motor=MotorLocal):
         except ValidationError as erro:
             raise HTTPException(400, 'Contrato de leitura inválido') from erro
         imagem = decodificar(entrada.foto_base64)
-        inicio = time.monotonic()
         try:
-            linhas = await run_in_threadpool(aplicacao.state.motor.reconhecer, imagem, entrada.campo)
+            return await run_in_threadpool(executar_motor, aplicacao.state.motor, imagem,
+                                           entrada.campo, entrada.foto_base64)
         except BlockingIOError as erro:
             raise HTTPException(503, 'OCR ocupado; tente novamente') from erro
         except Exception as erro:
@@ -113,12 +122,6 @@ def criar_app(fabrica_motor=MotorLocal):
             raise HTTPException(503, 'OCR indisponível; utilize o cadastro manual') from erro
         finally:
             imagem.close()
-        return {
-            'motor': 'PADDLEOCR', 'versaoBiblioteca': '3.3.2',
-            'versaoModelo': aplicacao.state.motor.versao, 'campo': entrada.campo,
-            'versaoPreprocessamento': aplicacao.state.motor.preprocessamento(entrada.campo),
-            'linhas': linhas, 'duracaoMs': round((time.monotonic() - inicio) * 1000),
-        }
 
     return aplicacao
 

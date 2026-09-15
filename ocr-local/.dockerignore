@@ -3,3 +3,5 @@ models
 __pycache__
 .pytest_cache
 .env
+.venv-ollama
+ollama-local

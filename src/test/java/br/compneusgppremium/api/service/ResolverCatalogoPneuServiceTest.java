@@ -48,6 +48,39 @@ class ResolverCatalogoPneuServiceTest {
         return new OcrResposta.Linha(texto, escore, List.of());
     }
 
+    @Test
+    void resolveModeloDoVlmComEscoreAusenteEPreservaNuloAoJuntarLinhas() {
+        var linhas = List.of(new OcrResposta.Linha("SUPER2000", null, List.of()),
+                new OcrResposta.Linha("SUPER 2000", null, List.of()));
+        var candidatos = resolvedor.resolverSnapshot("MODELO", linhas, Map.of(7, "SUPER 2000"));
+        assertThat(candidatos).singleElement().satisfies(candidato -> {
+            assertThat(candidato.id()).isEqualTo(7);
+            assertThat(candidato.escore()).isNull();
+        });
+    }
+
+    @Test
+    void resolveMedidaPaisEDotSemExigirEscoreDoVlm() {
+        assertThat(resolvedor.resolverSnapshot("MEDIDA",
+                List.of(new OcrResposta.Linha("205/55R16", null, List.of())), Map.of(1, "205/55R16")))
+                .singleElement().satisfies(candidato -> assertThat(candidato.escore()).isNull());
+        assertThat(resolvedor.resolverSnapshot("PAIS",
+                List.of(new OcrResposta.Linha("MADE IN CHINA", null, List.of())), Map.of(2, "CHINA")))
+                .singleElement().satisfies(candidato -> assertThat(candidato.escore()).isNull());
+        assertThat(resolvedor.resolverSnapshot("DOT",
+                List.of(new OcrResposta.Linha("3923", null, List.of())), Map.of()))
+                .singleElement().satisfies(candidato -> assertThat(candidato.escore()).isNull());
+    }
+
+    @Test
+    void ordenaAproximadosDoVlmSemConverterAusenciaDeEscoreEmNumero() {
+        var candidatos = resolvedor.resolverAproximado("MARCA",
+                List.of(new OcrResposta.Linha("MICHELIN", null, List.of())),
+                Map.of(1, "MICHELIN", 2, "MICHELIM"), null);
+        assertThat(candidatos).extracting("id").containsExactly(1, 2);
+        assertThat(candidatos).allSatisfy(candidato -> assertThat(candidato.escore()).isNull());
+    }
+
     private static MarcaModel marca(final Integer id, final String descricao) {
         MarcaModel marca = new MarcaModel();
         marca.setId(id);

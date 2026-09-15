@@ -1,4 +1,27 @@
 services:
+  ollama:
+    image: ollama/ollama:0.5.15
+    pull_policy: missing
+    restart: unless-stopped
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+      OLLAMA_NUM_PARALLEL: 1
+      OLLAMA_MAX_LOADED_MODELS: 1
+      OLLAMA_MAX_QUEUE: 1
+      OLLAMA_KEEP_ALIVE: -1
+      OLLAMA_NO_CLOUD: 1
+    volumes:
+      - ./ollama-local/root-ollama:/root/.ollama:rw
+      - ./ollama-local/manifest.json:/manifest.json:ro
+    networks: [ocr_interna]
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    healthcheck:
+      test: ["CMD", "/bin/sh", "-c", "wget -qO- http://127.0.0.1:11434/api/version 2>/dev/null | head -c 80 >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
   ocr:
     image: fabrica-ocr:local
     pull_policy: never
@@ -9,17 +32,29 @@ services:
       OCR_MODELS_DIR: /models
       OCR_MODELOS_RELEVO_DIR: /models-relevo
       OCR_PERFIL_DOT: ${OCR_PERFIL_DOT:-dot-relevo-v1}
-      # 'servidor' exige memória confirmada no host (ver comentário de RECONHECEDOR_SERVIDOR
-      # em pneus_ocr/engine.py) -- soh trocar depois de aumentar a memoria do Docker Desktop.
       OCR_RECONHECEDOR_RELEVO: ${OCR_RECONHECEDOR_RELEVO:-mobile}
+      OCR_MOTOR: ${OCR_MOTOR:-paddleocr}
+      OLLAMA_HOST_REMOTO: ollama
+      OLLAMA_HOST_REMOTO_PORTA: 11434
+      OLLAMA_ENDPOINT: http://127.0.0.1:11434
+      OLLAMA_MODELO: ${OLLAMA_MODELO:-gemma3:4b}
+      OLLAMA_CAMPOS: ${OLLAMA_CAMPOS:-MODELO}
+      OLLAMA_MANIFESTO: /manifest-ollama.json
+      OLLAMA_TIMEOUT_SECONDS: 12
+      OLLAMA_AQUECIMENTO_TIMEOUT_SECONDS: 120
     volumes:
       - ./models:/models:ro
       - ./models-relevo:/models-relevo:ro
+      - ./ollama-local/manifest.json:/manifest-ollama.json:ro
     networks: [ocr_interna]
     read_only: true
     tmpfs: [/tmp]
     security_opt: [no-new-privileges:true]
     cap_drop: [ALL]
+    depends_on:
+      ollama:
+        condition: service_healthy
+        required: false
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8091/ready')"]
       interval: 30s

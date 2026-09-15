@@ -81,8 +81,20 @@ public class OcrLocalClient {
         }
     }
     private boolean contratoAtendido(final OcrResposta resposta, final String campo) {
-        return resposta != null && "PADDLEOCR".equals(resposta.motor()) && campo.equals(resposta.campo())
-                && resposta.versaoModelo() != null && !resposta.versaoModelo().isBlank();
+        if (resposta == null || !campo.equals(resposta.campo()) || !preenchido(resposta.versaoModelo())) {
+            return false;
+        }
+        return switch (resposta.motor() == null ? "" : resposta.motor()) {
+            case "PADDLEOCR" -> resposta.linhas().stream().allMatch(linha -> linha.escore() != null
+                    && Double.isFinite(linha.escore()) && linha.escore() >= 0 && linha.escore() <= 1);
+            case "OLLAMA_LOCAL" -> preenchido(resposta.versaoBiblioteca())
+                    && preenchido(resposta.versaoPreprocessamento())
+                    && resposta.linhas().stream().allMatch(linha -> linha.escore() == null && linha.regiao().isEmpty());
+            default -> false;
+        };
+    }
+    private boolean preenchido(final String valor) {
+        return valor != null && !valor.isBlank();
     }
     private CadastroPneuException indisponivel() {
         return new CadastroPneuException("OCR_INDISPONIVEL", "OCR indisponível; informe o campo manualmente.",

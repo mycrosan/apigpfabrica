@@ -256,7 +256,7 @@ public class ResolverCatalogoPneuService {
         }
         return melhores.values().stream()
                 .sorted(Comparator.comparingInt((Candidato candidato) -> distancias.get(candidato.id()))
-                        .thenComparing(Comparator.comparingDouble(Candidato::escore).reversed()))
+                        .thenComparing(Candidato::escore, Comparator.nullsLast(Comparator.reverseOrder())))
                 .limit(MAXIMO_APROXIMADOS)
                 .toList();
     }
@@ -407,13 +407,14 @@ public class ResolverCatalogoPneuService {
     }
 
     private boolean ignorar(final OcrResposta.Linha linha) {
-        return linha.texto() == null || !Double.isFinite(linha.escore());
+        return linha.texto() == null || (linha.escore() != null && !Double.isFinite(linha.escore()));
     }
 
     private void juntar(final Map<Integer, Candidato> candidatos, final Map.Entry<Integer, String> item,
-            final double escore) {
+            final Double escore) {
         candidatos.merge(item.getKey(), new Candidato(item.getKey(), item.getValue(), escore),
-                (anterior, atual) -> anterior.escore() >= atual.escore() ? anterior : atual);
+                (anterior, atual) -> Comparator.nullsFirst(Double::compareTo)
+                        .compare(anterior.escore(), atual.escore()) >= 0 ? anterior : atual);
     }
 
     private List<Candidato> resolverDot(final List<OcrResposta.Linha> linhas) {

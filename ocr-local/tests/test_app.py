@@ -6,6 +6,7 @@ from unittest.mock import patch
 from fastapi.testclient import TestClient
 from PIL import Image
 from pneus_ocr.app import criar_app
+from pneus_ocr.gateway import MotorRoteado
 
 
 class MotorTeste:
@@ -65,3 +66,83 @@ def test_rejeita_campo_desconhecido():
             resposta = cliente.post('/v1/reconhecer', headers={'Authorization': 'Bearer interno-teste'},
                 json={'campo': 'DESCONHECIDO', 'foto_base64': imagem_base64()})
             assert resposta.status_code == 400
+
+
+def test_motor_ollama_expoe_versoes_reais_sem_inventar_escore():
+    class MotorOllamaTeste(MotorTeste):
+        motor = 'OLLAMA_LOCAL'
+        versao_biblioteca = 'ollama-teste'
+        versao = 'digest-pesos-vlm'
+
+        def reconhecer(self, imagem, campo):
+            return [{'texto': 'HF201', 'escore': None, 'regiao': []}]
+
+    with patch.dict(os.environ, {'OCR_TOKEN': 'interno-teste'}):
+        with TestClient(criar_app(MotorOllamaTeste)) as cliente:
+            resposta = cliente.post('/v1/reconhecer', headers={'Authorization': 'Bearer interno-teste'},
+                json={'campo': 'MODELO', 'foto_base64': imagem_base64()})
+    assert resposta.status_code == 200
+    assert resposta.json()['motor'] == 'OLLAMA_LOCAL'
+    assert resposta.json()['versaoBiblioteca'] == 'ollama-teste'
+    assert resposta.json()['versaoModelo'] == 'digest-pesos-vlm'
+    assert resposta.json()['linhas'][0]['escore'] is None
+    assert resposta.json()['linhas'][0]['regiao'] == []
+
+
+def test_readiness_revalida_motor_depois_da_inicializacao():
+    class MotorInvalido(MotorTeste):
+        def pronta(self):
+            raise RuntimeError('Pesos divergentes')
+
+    with patch.dict(os.environ, {'OCR_TOKEN': 'interno-teste'}):
+        with TestClient(criar_app(MotorInvalido)) as cliente:
+            assert cliente.get('/health').status_code == 200
+            assert cliente.get('/ready').status_code == 503
+
+
+def test_falha_e_ocupacao_fecham_imagem_sem_expor_erro():
+    import pytest
+    for falha in (RuntimeError('conteudo-sensivel'), BlockingIOError('conteudo-sensivel')):
+        imagens = []
+
+        class MotorFalho(MotorTeste):
+            def reconhecer(self, imagem, campo):
+                imagens.append(imagem)
+                raise falha
+
+        with patch.dict(os.environ, {'OCR_TOKEN': 'interno-teste'}):
+            with TestClient(criar_app(MotorFalho)) as cliente:
+                resposta = cliente.post('/v1/reconhecer', headers={'Authorization': 'Bearer interno-teste'},
+                    json={'campo': 'MODELO', 'foto_base64': imagem_base64()})
+        assert resposta.status_code == 503
+        assert 'conteudo-sensivel' not in resposta.text
+        with pytest.raises(ValueError):
+            imagens[0].getpixel((0, 0))
+
+
+def test_hibrido_atende_paddle_mesmo_com_readiness_ollama_indisponivel():
+    class PaddleTeste:
+        def pronta(self):
+            return True
+
+        def executar(self, campo, foto_base64):
+            assert foto_base64 == foto_original
+            return {'motor': 'PADDLEOCR', 'campo': campo, 'linhas': []}
+
+    def ollama_falho():
+        raise FileNotFoundError('Modelo não provisionado')
+
+    def fabrica(diretorio):
+        return MotorRoteado(ollama_falho, PaddleTeste)
+
+    foto_original = imagem_base64()
+    with patch.dict(os.environ, {'OCR_TOKEN': 'interno-teste', 'OLLAMA_CAMPOS': 'MODELO'}):
+        with TestClient(criar_app(fabrica)) as cliente:
+            assert cliente.get('/ready').status_code == 503
+            medida = cliente.post('/v1/reconhecer', headers={'Authorization': 'Bearer interno-teste'},
+                json={'campo': 'MEDIDA', 'foto_base64': foto_original})
+            modelo = cliente.post('/v1/reconhecer', headers={'Authorization': 'Bearer interno-teste'},
+                json={'campo': 'MODELO', 'foto_base64': foto_original})
+    assert medida.status_code == 200
+    assert medida.json()['motor'] == 'PADDLEOCR'
+    assert modelo.status_code == 503

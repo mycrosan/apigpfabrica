@@ -64,6 +64,62 @@ class LeituraCarcacaServiceTest {
         assertThat(resultado.probabilidadeCalibrada()).isNull();
     }
     @Test
+    void ollamaPreservaTranscricaoECandidatosSemHerdarAprovacaoDoPaddle() {
+        var servico = servico(true, "205/55R16", List.of(new Candidato(1, "205/55R16", null)));
+        when(motor.ler(anyString(), anyString())).thenReturn(new OcrResposta("OLLAMA_LOCAL", "runtime-teste",
+                "sha256-config", "MEDIDA", List.of(new OcrResposta.Linha("205/55R16", null, List.of())),
+                500, "ollama-vision-rgb-v1"));
+
+        var evidencia = servico.analisarComEvidencia(LeituraCarcacaService.Campo.MEDIDA, "foto", 1, 2);
+        var resultado = evidencia.resultado();
+        assertThat(resultado.estado()).isEqualTo("AMBIGUA");
+        assertThat(resultado.motivos()).contains("OLLAMA_NAO_VALIDADO");
+        assertThat(resultado.textoOriginal()).isEqualTo("205/55R16");
+        assertThat(resultado.itemSugeridoId()).isNull();
+        assertThat(resultado.valorSugerido()).isNull();
+        assertThat(resultado.escoreOcrBruto()).isNull();
+        assertThat(resultado.probabilidadeCalibrada()).isNull();
+        assertThat(resultado.candidatos()).singleElement().satisfies(candidato -> {
+            assertThat(candidato.id()).isEqualTo(1);
+            assertThat(candidato.escore()).isNull();
+        });
+        assertThat(evidencia.campoAprovado()).isFalse();
+        assertThat(evidencia.extracao().motor()).isEqualTo("OLLAMA_LOCAL");
+        assertThat(evidencia.extracao().versaoBiblioteca()).isEqualTo("runtime-teste");
+        assertThat(evidencia.preprocessamento()).isEqualTo("ollama-vision-rgb-v1");
+        assertThat(evidencia.politica()).isEqualTo("decisao-conservadora-v2");
+
+        var legado = servico.lerCampo(LeituraCarcacaService.Campo.MEDIDA, "foto", 1, 2);
+        assertThat(legado.getId()).isNull();
+        assertThat(legado.getConfianca()).isEqualTo("BAIXA");
+        assertThat(legado.getCandidatos().get(0).getEscore()).isNull();
+        assertThat(legado.getMensagem()).contains("em avaliação", "manualmente");
+    }
+
+    @Test
+    void ollamaNaoPromoveNemSeUmAdaptadorProduzirEscoreAlto() {
+        var servico = servico(true, "205/55R16", List.of(new Candidato(1, "205/55R16", 1.0)));
+        when(motor.ler(anyString(), anyString())).thenReturn(new OcrResposta("OLLAMA_LOCAL", "runtime-teste",
+                "sha256-config", "MEDIDA", List.of(new OcrResposta.Linha("205/55R16", null, List.of())),
+                500, "ollama-vision-rgb-v1"));
+        var resultado = servico.analisar(LeituraCarcacaService.Campo.MEDIDA, "foto", 1, 2);
+        assertThat(resultado.estado()).isNotEqualTo("SUGESTAO");
+        assertThat(resultado.itemSugeridoId()).isNull();
+        assertThat(resultado.motivos()).contains("OLLAMA_NAO_VALIDADO");
+    }
+
+    @Test
+    void ollamaSemTextoContinuaIlegivel() {
+        var servico = servico(true, "", List.of());
+        when(motor.ler(anyString(), anyString())).thenReturn(new OcrResposta("OLLAMA_LOCAL", "runtime-teste",
+                "sha256-config", "MEDIDA", List.of(), 500, "ollama-vision-rgb-v1"));
+        var resultado = servico.analisar(LeituraCarcacaService.Campo.MEDIDA, "foto", 1, 2);
+        assertThat(resultado.estado()).isEqualTo("ILEGIVEL");
+        assertThat(resultado.mensagem()).contains("Não consegui ler");
+        assertThat(resultado.motivos()).contains("TEXTO_AUSENTE", "OLLAMA_NAO_VALIDADO");
+        assertThat(resultado.candidatos()).isEmpty();
+    }
+    @Test
     void baixaConfiancaNaoLiberaSugestao() {
         var resultado = servico(true, "205/55R16", List.of(new Candidato(1, "205/55R16", 0.6)))
                 .analisar(LeituraCarcacaService.Campo.MEDIDA, "foto", 1, 2);

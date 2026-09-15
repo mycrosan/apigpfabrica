@@ -7,5 +7,5 @@ public record ResultadoLeituraDTO(String campo, String estado, List<String> moti
         motivos = List.copyOf(motivos);
         candidatos = List.copyOf(candidatos);
     }
-    public record Candidato(Integer id, String texto, double escore) {}
+    public record Candidato(Integer id, String texto, Double escore) {}
 }

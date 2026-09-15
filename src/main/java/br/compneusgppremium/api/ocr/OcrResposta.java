@@ -11,7 +11,8 @@ public record OcrResposta(String motor, String versaoBiblioteca, String versaoMo
     public OcrResposta {
         linhas = List.copyOf(linhas);
     }
-    public record Linha(String texto, double escore, List<List<Integer>> regiao) {
+    // VLM transcreve sem escore de OCR ou caixa de detecção; ausência permanece explícita na auditoria.
+    public record Linha(String texto, Double escore, List<List<Integer>> regiao) {
         public Linha {
             regiao = regiao.stream().map(List::copyOf).toList();
         }

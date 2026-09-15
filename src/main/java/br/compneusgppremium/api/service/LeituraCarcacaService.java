@@ -25,7 +25,7 @@ public class LeituraCarcacaService {
     public enum Campo { DOT, MARCA, MODELO, MEDIDA, PAIS }
     private static final String PREPROCESSAMENTO = "exif-transpose-rgb-v1";
     private static final String NORMALIZACAO = "catalogo-exato-v1";
-    private static final String POLITICA = "decisao-conservadora-v1";
+    private static final String POLITICA = "decisao-conservadora-v2";
     private final OcrLocalClient ocr;
     private final OcrLocalProperties configuracao;
     private final ImagemLeituraService imagens;
@@ -46,7 +46,7 @@ public class LeituraCarcacaService {
             var resultado = decidir(campo, leitura, snapshot, marcaId);
             log.info("leitura decisao id={} campo={} estado={} motivos={} candidatos={} campoAprovado={} escoreMinimo={} politica={}",
                     MDC.get("leituraId"), campo, resultado.estado(), resultado.motivos(), resultado.candidatos().size(),
-                    configuracao.camposAprovados().contains(campo.name()), configuracao.escoreMinimo(), POLITICA);
+                    campoAprovado(campo, leitura), configuracao.escoreMinimo(), POLITICA);
             return montar(campo, resultado, leitura, snapshot);
         } catch (RuntimeException erro) {
             // A extração já custou foto e inferência: preservá-la separa falha de resolução de falha de leitura.
@@ -84,21 +84,34 @@ public class LeituraCarcacaService {
         } else if (candidatos.size() == 1) {
             var candidato = candidatos.get(0);
             escore = candidato.escore();
-            motivo = configuracao.camposAprovados().contains(campo.name()) ? "BAIXA_CONFIANCA" : "MODELO_NAO_APROVADO";
-            if (configuracao.camposAprovados().contains(campo.name()) && escore >= configuracao.escoreMinimo()) {
+            motivo = campoAprovado(campo, leitura) ? "BAIXA_CONFIANCA" : "MODELO_NAO_APROVADO";
+            if (campoAprovado(campo, leitura) && escore != null && Double.isFinite(escore)
+                    && escore >= configuracao.escoreMinimo()) {
                 estado = "SUGESTAO"; motivo = "CONFIRMACAO_OBRIGATORIA";
                 id = candidato.id(); valor = candidato.texto(); mensagem = "Confira a foto e confirme o valor.";
             }
         }
-        return new ResultadoLeituraDTO(campo.name(), estado, List.of(motivo), texto, id, valor, candidatos,
+        List<String> motivos = List.of(motivo);
+        if ("OLLAMA_LOCAL".equals(leitura.motor())) {
+            motivos = List.of(motivo, "OLLAMA_NAO_VALIDADO");
+            if (!candidatos.isEmpty()) {
+                mensagem = "Leitura local em avaliação. Confira a foto e informe o valor manualmente.";
+            }
+        }
+        return new ResultadoLeituraDTO(campo.name(), estado, motivos, texto, id, valor, candidatos,
                 escore, null, mensagem, leitura.versaoModelo());
+    }
+    private boolean campoAprovado(final Campo campo, final OcrResposta leitura) {
+        // As aprovações anteriores pertencem ao PaddleOCR e não promovem um motor novo por herança.
+        return leitura != null && "PADDLEOCR".equals(leitura.motor())
+                && configuracao.camposAprovados().contains(campo.name());
     }
     private ExecucaoLeituraDTO montar(final Campo campo, final ResultadoLeituraDTO resultado,
             final OcrResposta leitura, final Map<Integer, String> snapshot) {
         String preprocessamento = leitura != null && leitura.versaoPreprocessamento() != null
                 && !leitura.versaoPreprocessamento().isBlank() ? leitura.versaoPreprocessamento() : PREPROCESSAMENTO;
         return new ExecucaoLeituraDTO(resultado, leitura, snapshot, preprocessamento, NORMALIZACAO, POLITICA,
-                configuracao.escoreMinimo(), configuracao.camposAprovados().contains(campo.name()),
+                configuracao.escoreMinimo(), campoAprovado(campo, leitura),
                 identificacao.atual());
     }
     private FalhaLeituraComEvidencia falha(final Campo campo, final Map<Integer, String> snapshot,
@@ -157,6 +170,9 @@ public class LeituraCarcacaService {
     }
 
     private String mensagemLegada(final ResultadoLeituraDTO resultado) {
+        if (resultado.motivos().contains("OLLAMA_NAO_VALIDADO")) {
+            return resultado.mensagem();
+        }
         if ("SUGESTAO".equals(resultado.estado())) {
             return "Leitura automática. Confira a foto e confirme o valor.";
         }

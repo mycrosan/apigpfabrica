@@ -6,7 +6,7 @@ Aplicar a todo este repositório, especialmente Java, DTOs, controllers, serviç
 
 Estas regras implementam as instruções do usuário de 05/09/2026. `CODING_STANDARDS.md`, `DEVELOPMENT.md` e `RULES_SUMMARY.md` são referências auxiliares; exemplos antigos de Java 11, entidades expostas, mutabilidade ou configuração não prevalecem sobre estas exigências.
 
-Para reconhecimento de pneus, seguir a spec na issue central: <https://github.com/mycrosan/apigpfabrica/issues/1>. Usar exclusivamente PaddleOCR em serviço interno, sem chamada externa de IA em nenhuma rota, comparação ou fallback. Falha encaminha ao cadastro manual com evidência.
+Para reconhecimento de pneus, seguir a spec na issue central: <https://github.com/mycrosan/apigpfabrica/issues/1>. Em 15/09/2026, o usuário autorizou também visão por Ollama exclusivamente local, ampliando a exclusividade anterior de PaddleOCR. Ambos usam adaptadores no serviço Python interno, sem chamada externa de IA em nenhuma rota, comparação ou fallback. Ollama começa em avaliação e não herda aprovação do PaddleOCR. Falha encaminha ao cadastro manual com evidência. Consultar `ocr-local/OLLAMA.md` para provisionamento, compatibilidade e rollback.
 
 ## Ambiente e pré-requisitos
 
